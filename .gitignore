@@ -1,0 +1,16 @@
+dev-data/
+node_modules/
+*.log
+config.env
+public
+.env
+ToDo.txt
+notes.txt
+PROJECT_SNAPSHOT.md
+dist/
+build/
+.DS_Store
+.parcel-cache/
+.next/
+.vscode/
+*.log

@@ -1,0 +1,17 @@
+/* src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Add these styles for the sticky footer --- */
+
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Make the container at least the full height of the viewport */
+}
+
+main {
+  flex-grow: 1; /* Allow the main content area to grow and fill any empty space */
+}
