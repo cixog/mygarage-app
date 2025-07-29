@@ -1,5 +1,5 @@
-dev-data/
-node_modules/
+/dev-data
+/node_modules
 *.log
 config.env
 public
@@ -7,10 +7,11 @@ public
 ToDo.txt
 notes.txt
 PROJECT_SNAPSHOT.md
-dist/
-build/
+/dist
+/build
 .DS_Store
-.parcel-cache/
-.next/
-.vscode/
+Thumbs.db
+.parcel-cache
+.next
+.vscode
 *.log

@@ -1,0 +1,6 @@
+https://www.ultimatespecs.com
+https://jsonlint.com
+https://www.jsonschema.net/app/schemas/0
+
+This knocks out the irritating eslint unused variable warning for one instance
+// eslint-disable-next-line no-unused-vars

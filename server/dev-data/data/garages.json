@@ -1,0 +1,790 @@
+[
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 1,
+    "name": "Petersen Automotive Museum",
+    "cityState": "Los Angeles, CA",
+    "address": "6060 Wilshire Blvd, Los Angeles, CA",
+    "zipcode": "90036",
+    "website": "https://www.petersen.org",
+
+    "description": "The Petersen Automotive Museum is an automobile museum located on Wilshire Boulevard along Museum Row in the Miracle Mile neighborhood of Los Angeles. One of the world's largest collections, the Petersen Automotive Museum is a nonprofit organization specializing in automobile history and related educational programs. \nThe Vault, presented by Hagerty®, features over 250 vehicles from around the world. Discover some of the most iconic and rare cars, motorcycles, and trucks spanning over 120 years of automotive history. Explore the story of the automobile, from early legends to stunning modern supercars. You will see turn-of-the-twentieth-century cars, head-of-state vehicles, American classics, the personal rides of Hollywood legends, award-winning hot rods, cars that pushed the boundaries of innovation, and many other surprises.",
+    "coverPhoto": "garage-2-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-2-1.jpg", "description": "view" },
+      { "url": "garage-2-2.jpg", "description": "interior" },
+      { "url": "garage-2-3.jpg", "description": "engine" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Peterson Automotive Museum",
+        "coordinates": [-118.36136309999998, 34.06223287028613]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Kid's Day",
+        "eventDate": "2025-05-22T09:00:00Z",
+        "description": "free admission for children under 12"
+      },
+      {
+        "eventName": "Vintage Car Show",
+        "eventDate": "2025-06-15T09:00:00Z",
+        "description": "An exhibition of classic cars from the 1950s and 1960s."
+      },
+      {
+        "eventName": "Garage Open House",
+        "eventDate": "2025-08-20T09:00:00Z",
+        "description": "Tour our facilities and see our latest restoration projects."
+      }
+    ],
+    "views": 1000,
+    "rating": 4.5,
+    "automobiles": [
+      {
+        "id": "3",
+        "make": "Ford",
+        "model": "Model T",
+        "year": 1925,
+        "vin": "1234567890",
+        "engine": {
+          "type": "Inline-4",
+          "displacement": "2.9L",
+          "horsepower": 20
+        },
+        "category": "Vintage",
+        "forSale": true,
+        "price": 5000,
+        "ownerHistory": [
+          {
+            "ownerName": "John Doe",
+            "ownershipYears": "1925-1940",
+            "notes": "Original owner."
+          },
+          {
+            "ownerName": "Jane Smith",
+            "ownershipYears": "1940-1950",
+            "notes": "Second owner, restored in 1945."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "1945-06-15",
+            "details": "Full engine overhaul and repaint."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/model-t-front.jpg",
+            "description": "Front view of the Ford Model T."
+          }
+        ],
+        "historicalSignificance": "The Ford Model T revolutionized the automobile industry as the first car to be mass-produced on an assembly line."
+      }
+    ]
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 2,
+    "name": "National Automobile Museum",
+    "cityState": "Reno, NV",
+    "address": "10 S Lake St, Reno, NV",
+    "zipcode": "89501",
+    "website": "https://www.automuseum.org",
+
+    "description": "The National Automobile Museum is a museum in Reno, Nevada. Most of the vehicles displayed are from the collection of William F. Harrah. The museum opened on November 5, 1989. \nWilliam F. Harrah collected approximately 1,450 automobiles, which he stored inside warehouses in Sparks, Nevada. It was the world's largest collection of historic automobiles, and was open to the public.",
+    "coverPhoto": "garage-5-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-5-1.jpg", "description": "view" },
+      { "url": "garage-5-2.jpg", "description": "view" },
+      { "url": "garage-5-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "National Automotive Museum",
+        "coordinates": [-119.80850482410428, 39.526761529648965]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Vintage Car Show",
+        "eventDate": "2025-06-15",
+        "description": "An exhibition of classic cars from the 1950s and 1960s."
+      },
+      {
+        "eventName": "Garage Open House",
+        "eventDate": "2025-08-20",
+        "description": "Tour our facilities and see our latest restoration projects."
+      }
+    ],
+    "views": 13502,
+    "rating": 4.8,
+    "automobiles": [
+      {
+        "id": "2",
+        "make": "Chevrolet",
+        "model": "Corvette",
+        "year": 1963,
+        "vin": "30837S100001",
+        "engine": {
+          "type": "V8",
+          "displacement": "5.4L",
+          "horsepower": 360
+        },
+        "category": "Classic Sports",
+        "forSale": false,
+        "price": 150000,
+        "ownerHistory": [
+          {
+            "ownerName": "Caroline Johnson",
+            "ownershipYears": "1963-1970",
+            "notes": "Purchased new from Chevrolet."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "1995-04-10",
+            "details": "Complete bodywork restoration, engine rebuilt."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/corvette-front.jpg",
+            "description": "Front view of the 1963 Chevrolet Corvette."
+          }
+        ],
+        "historicalSignificance": "Known for its unique split rear window design and its role in popularizing the Corvette brand."
+      }
+    ]
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 3,
+    "name": "Dave's Machines",
+    "cityState": "Las Vegas, NV",
+    "address": "123 Apple St.",
+    "zipcode": "89045",
+    "website": "https://www.davesmachines.org",
+
+    "description": "Best known exisiting 2000 Tacoma in the Western Hemisphere. \nLandscapers come from thousands of miles to make an offer to buy this timeless machine.",
+    "coverPhoto": "garage-1-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-1-1.jpg", "description": "view" },
+      { "url": "garage-1-2.jpg", "description": "view" },
+      { "url": "garage-1-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Daves Machines",
+        "coordinates": [-114.98181084694103, 36.03943932295937]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Dave's Day",
+        "eventDate": "2025-06-17T09:00:00Z",
+        "description": "Invite only."
+      },
+      {
+        "eventName": "Vintage Truck Show",
+        "eventDate": "2025-07-15T09:00:00Z",
+        "description": "Invitation only."
+      },
+      {
+        "eventName": "Garage Closed House",
+        "eventDate": "2025-09-15T09:00:00Z",
+        "description": "Public is not welcome Go away!."
+      }
+    ],
+    "views": 10388,
+    "rating": 4.2,
+    "automobiles": [
+      {
+        "id": "1",
+        "make": "Toyota",
+        "model": "Tacoma",
+        "year": 2000,
+        "vin": "N/A",
+        "engine": {
+          "type": "Inline-4",
+          "displacement": "3.7L",
+          "horsepower": 150
+        },
+        "category": "Contemporary",
+        "forSale": true,
+        "price": 10000,
+        "ownerHistory": [
+          {
+            "ownerName": "Smelly Guy",
+            "ownershipYears": "2000-2005",
+            "notes": "Original owner."
+          },
+          {
+            "ownerName": "Dave",
+            "ownershipYears": "2005-Present",
+            "notes": "Second owner."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "2022-06-15",
+            "details": "Valves replaced."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/model-t-front.jpg",
+            "description": "Front view of the Tacoma."
+          }
+        ],
+        "historicalSignificance": "The Toyota Tacoma is an extremely durable and popular pick-up truck."
+      }
+    ]
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 4,
+    "name": "James Bond's Garage",
+    "cityState": "London, UK",
+    "address": "123 Spy Road, Mayfair",
+    "zipcode": "123 456",
+    "website": "https://www.Bond007.org",
+
+    "description": "In the James Bond Museum, you can see Hovercraft from ”Die Another day” Gondola from Moonraker, aircraft Cessna 172, Aston Martin, Jaguar E-Type, bikini from Izabella Scorupco Goldeneye, Omega Seamaster watches, (Timothy Dalton) scuba equipment from Licence To Kill. \nNews: Lotus Esprit Turbo (For Your Eyes Only), \n”No Time To Die” TRIUMPH SCRAMBLER \n1200 BOND EDITION ON DISPLAY IN THE JAMES BOND 007 MUSEUM NYBRO SWEDEN, \nTriumph Tiger 900 Bond edition from ”No Time To Die”",
+    "coverPhoto": "garage-3-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-3-1.jpg", "description": "view" },
+      { "url": "garage-3-2.jpg", "description": "view" },
+      { "url": "garage-3-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Bond, Bond's Garage",
+        "coordinates": [15.891932204697895, 56.74006843933337]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Secret Agent Day",
+        "eventDate": "2025-06-02T09:00:00Z",
+        "description": "free admission for those with a shoe phone"
+      },
+      {
+        "eventName": "Q's latest inventions",
+        "eventDate": "2025-04-01T09:00:00Z",
+        "description": "See things you aren't supposed to see."
+      },
+      {
+        "eventName": "Drive Like Bond Day",
+        "eventDate": "2025-08-01T09:00:00Z",
+        "description": "Wreck an Aston Martin."
+      }
+    ],
+    "views": 264504,
+    "rating": 5.0,
+    "automobiles": [
+      {
+        "id": "1",
+        "make": "Aston-Martin",
+        "model": "DB-5",
+        "year": 1963,
+        "vin": "N/A",
+        "engine": {
+          "type": "Inline-6",
+          "displacement": "2.9L",
+          "horsepower": 150
+        },
+        "category": "Vintage",
+        "forSale": false,
+        "price": 1000000,
+        "ownerHistory": [
+          {
+            "ownerName": "Q",
+            "ownershipYears": "1963",
+            "notes": "Original owner."
+          },
+          {
+            "ownerName": "James Bond",
+            "ownershipYears": "1963-Present",
+            "notes": "Second owner."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "1963-06-15",
+            "details": "Machine guns installed."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/aston-martin.jpg",
+            "description": "Front view of the DB-5."
+          }
+        ],
+        "historicalSignificance": "Made famous by James Bond."
+      }
+    ]
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 5,
+    "name": "Dustys Cars",
+    "cityState": "Pleasanton, CA",
+    "address": "3440 Stanley Boulevard",
+    "zipcode": "94566",
+    "website": "https://www.dustycars.com",
+
+    "description": "The Best in the West",
+    "coverPhoto": "garage-4-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-4-1.jpg", "description": "view" },
+      { "url": "garage-4-2.jpg", "description": "view" },
+      { "url": "garage-4-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Dustys Cars",
+        "coordinates": [-121.86251094462249, 37.66872722195437]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Buy an Expensive Car Day",
+        "eventDate": "2025-04-15T09:00:00Z",
+        "description": "Blow your tax refund on a car you can't afford."
+      },
+      {
+        "eventName": "Vintage Car Show",
+        "eventDate": "2025-07-04T09:00:00Z",
+        "description": "An exhibition of classic cars from the 1950s and 1960s."
+      },
+      {
+        "eventName": "Garage Open House",
+        "eventDate": "2025-03-30T09:00:00Z",
+        "description": "See our latest restoration projects."
+      }
+    ],
+    "views": 4950,
+    "rating": 4.1,
+    "automobiles": [
+      {
+        "id": "1",
+        "make": "Porsche",
+        "model": "911",
+        "year": 1968,
+        "vin": "N/A",
+        "engine": {
+          "type": "6 cylinder",
+          "displacement": "2.0L",
+          "horsepower": 151
+        },
+        "category": "Vintage",
+        "forSale": true,
+        "price": 101000,
+        "ownerHistory": [
+          {
+            "ownerName": "unk",
+            "ownershipYears": "1990",
+            "notes": "none"
+          },
+          {
+            "ownerName": "Dusty Cars",
+            "ownershipYears": "2023-present",
+            "notes": "Restored to running/driving condition"
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "2023-06-15T00:00:00.000Z",
+            "details": "Restored."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/porsche 911.jpg",
+            "description": "Front view of the 911."
+          }
+        ],
+        "historicalSignificance": "It's a 911."
+      },
+      {
+        "id": "2",
+        "make": "Chevrolet",
+        "model": "Corvette",
+        "year": 1963,
+        "vin": "N/A",
+        "engine": {
+          "type": "V-8",
+          "displacement": "327 cu-in",
+          "horsepower": 365
+        },
+        "category": "Vintage",
+        "forSale": true,
+        "price": 52000,
+        "ownerHistory": [
+          {
+            "ownerName": "unk",
+            "ownershipYears": "1963",
+            "notes": "none"
+          },
+          {
+            "ownerName": "Dusty Cars",
+            "ownershipYears": "2023-present",
+            "notes": "Project car"
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "2023-06-15T00:00:00.000Z",
+            "details": "Unrestored."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/Corvette.jpg",
+            "description": "Front view of the Corvette."
+          }
+        ],
+        "historicalSignificance": "1963 Chevrolet Corvette Split-Window Coupe"
+      }
+    ],
+    "createAt": "2025-01-07T16:42:52.066Z",
+    "__v": 0
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 6,
+    "name": "Automotive Restorations, Inc.",
+    "cityState": "Stratford, CT",
+    "address": "100 Lupes Drive",
+    "zipcode": "06615",
+    "website": "http://automotiverestorations.com",
+
+    "description": "The Best in the West",
+    "coverPhoto": "garage-6-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-6-1.jpg", "description": "view" },
+      { "url": "garage-6-2.jpg", "description": "view" },
+      { "url": "garage-6-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Automotive Restorations",
+        "coordinates": [-119.80850482410428, 39.526761529648965]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Restoration Day",
+        "eventDate": "2025-06-18T09:00:00Z",
+        "description": "free admission for children under 12"
+      },
+      {
+        "eventName": "Driving Car Show",
+        "eventDate": "2025-06-15T09:00:00Z",
+        "description": "Parade of cars that have been restored."
+      },
+      {
+        "eventName": "Blow you Paycheck Day",
+        "eventDate": "2025-08-20T09:00:00Z",
+        "description": "Buy something you can't afford."
+      }
+    ],
+    "views": 157514,
+    "rating": 3.3,
+    "automobiles": [
+      {
+        "id": "1",
+        "make": "Porsche",
+        "model": "356",
+        "year": 1951,
+        "vin": "10712",
+        "engine": {
+          "type": "Inline-6",
+          "displacement": "1500cc",
+          "horsepower": 150
+        },
+        "category": "Vintage",
+        "forSale": false,
+        "price": 527500,
+        "ownerHistory": [
+          {
+            "ownerName": "Private owner",
+            "ownershipYears": "2023",
+            "notes": "Original owner."
+          },
+          {
+            "ownerName": "Automotive Restorations, Inc.",
+            "ownershipYears": "2023-Present",
+            "notes": "Second owner."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "2003-06-15",
+            "details": "Engine overhaul."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/porsche356.jpg",
+            "description": "Front view Porsche 356."
+          }
+        ],
+        "historicalSignificance": "First generation of the 356. Aluminum bodied car hand produced in Gmund, Austria."
+      },
+      {
+        "id": "2",
+        "make": "Alfa Romeo",
+        "model": "Spider  Duetto",
+        "year": 1968,
+        "vin": "1410463",
+        "engine": {
+          "type": "Inline-6",
+          "displacement": "1750cc",
+          "horsepower": 160
+        },
+        "category": "Vintage",
+        "forSale": true,
+        "price": 66200,
+        "ownerHistory": [
+          {
+            "ownerName": "Clifford Warren",
+            "ownershipYears": "1968 - 2023",
+            "notes": "Original owner."
+          },
+          {
+            "ownerName": "Automotive Restorations, Inc.",
+            "ownershipYears": "2023-Present",
+            "notes": "Second owner."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "1991",
+            "details": "Full restoration."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/alfa-romeo.jpg",
+            "description": "Quarter view Alfa Romeo."
+          }
+        ],
+        "historicalSignificance": "Affordable sports car."
+      },
+      {
+        "id": "3",
+        "make": "Ford",
+        "model": "Deluxe Woody Wagon",
+        "year": 1939,
+        "vin": "4126",
+        "engine": {
+          "type": "V-8",
+          "displacement": " ",
+          "horsepower": 85
+        },
+        "category": "Vintage",
+        "forSale": true,
+        "price": 55000,
+        "ownerHistory": [
+          {
+            "ownerName": "Multiple",
+            "ownershipYears": "1939 - 2023",
+            "notes": "Multiple owners."
+          },
+          {
+            "ownerName": "Automotive Restorations, Inc.",
+            "ownershipYears": "2023-Present",
+            "notes": "Second owner."
+          }
+        ],
+        "restorationRecords": [
+          {
+            "date": "2020",
+            "details": "Full restoration."
+          }
+        ],
+        "photos": [
+          {
+            "url": "https://example.com/photos/Ford-woodie.jpg",
+            "description": "Quarter view Alfa Romeo."
+          }
+        ],
+        "historicalSignificance": "The first SUV."
+      }
+    ]
+  },
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 1001,
+    "name": "Test Museum 1",
+    "description": "The Best in the West",
+    "coverPhoto": "garage-1-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-1-1.jpg", "description": "view" },
+      { "url": "garage-1-2.jpg", "description": "view" },
+      { "url": "garage-1-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Test Museum 1",
+        "coordinates": [-112.98181084694103, 35.03943932295937]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Kid's Day",
+        "eventDate": "2025-05-22T09:00:00Z",
+        "description": "free admission- children under 12"
+      }
+    ],
+    "automobiles": [
+      {
+        "id": "1111",
+        "make": "Ford",
+        "model": "Model 1",
+        "year": 1234,
+        "engine": {
+          "type": "V8",
+          "displacement": "2.9L",
+          "horsepower": 20
+        },
+        "category": "Vintage"
+      }
+    ]
+  },
+
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 2002,
+    "name": "Test Museum 2",
+
+    "description": "The Best in the West",
+    "coverPhoto": "garage-1-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-1-1.jpg", "description": "view" },
+      { "url": "garage-1-2.jpg", "description": "view" },
+      { "url": "garage-1-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Test Museum 2",
+        "coordinates": [-110.98181084694103, 39.03943932295937]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Kid's Day",
+        "eventDate": "2025-05-22T09:00:00Z",
+        "description": "free admission- children under 12"
+      }
+    ],
+    "automobiles": [
+      {
+        "id": "2222",
+        "make": "Ford",
+        "model": "Model 1",
+        "year": 1234,
+        "engine": {
+          "type": "V8",
+          "displacement": "2.9L",
+          "horsepower": 20
+        },
+        "category": "Vintage"
+      }
+    ]
+  },
+
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 3003,
+    "name": "Test Museum 3",
+
+    "description": "The Best in the West",
+    "coverPhoto": "garage-1-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-1-1.jpg", "description": "view" },
+      { "url": "garage-1-2.jpg", "description": "view" },
+      { "url": "garage-1-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Test Museum 3",
+        "coordinates": [-110.555084694103, 39.999932295937]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Kid's Day",
+        "eventDate": "2025-05-22T09:00:00Z",
+        "description": "free admission- children under 12"
+      }
+    ],
+    "automobiles": [
+      {
+        "id": "3333",
+        "make": "Ford",
+        "model": "Model 1",
+        "year": 1234,
+        "engine": {
+          "type": "V8",
+          "displacement": "2.9L",
+          "horsepower": 20
+        },
+        "category": "Vintage"
+      }
+    ]
+  },
+
+  {
+    "user": "5c8a1ec62f8fb814b56fa183",
+    "garage_id": 4004,
+    "name": "Test Museum 4",
+
+    "description": "The Best in the West",
+    "coverPhoto": "garage-1-cover.jpg",
+    "userPhotos": [
+      { "url": "garage-1-1.jpg", "description": "view" },
+      { "url": "garage-1-2.jpg", "description": "view" },
+      { "url": "garage-1-3.jpg", "description": "view" }
+    ],
+    "locations": [
+      {
+        "type": "Point",
+        "summary": "Test Museum 4",
+        "coordinates": [-111.98181084694103, 45.03943932295937]
+      }
+    ],
+    "specialEvents": [
+      {
+        "eventName": "Kid's Day",
+        "eventDate": "2025-05-22T09:00:00Z",
+        "description": "free admission- children under 12"
+      }
+    ],
+    "automobiles": [
+      {
+        "id": "4444",
+        "make": "Ford",
+        "model": "Model 1",
+        "year": 1234,
+        "engine": {
+          "type": "V8",
+          "displacement": "2.9L",
+          "horsepower": 20
+        },
+        "category": "Vintage"
+      }
+    ]
+  }
+]

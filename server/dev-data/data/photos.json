@@ -1,0 +1,12 @@
+[
+  {
+    "_id": "668d6aa63a9f9c84b3e9fa1c",
+    "user": "668d6aa63a9f9c84b3e9fa1a",
+    "vehicle": "668d6aa63a9f9c84b3e9fa1b",
+    "photo": "uploads/photos/vehicle_001_img1.jpg",
+    "caption": "My 1967 Mustang at sunset",
+    "likes": ["668d6aa63a9f9c84b3e9fa1d", "668d6aa63a9f9c84b3e9fa1e"],
+    "createdAt": "2025-07-10T20:30:15.000Z",
+    "__v": 0
+  }
+]
