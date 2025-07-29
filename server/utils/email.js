@@ -14,11 +14,12 @@ const sendEmail = async options => {
 
   // 2) Define the email options
   const mailOptions = {
-    from: 'MyGarage Admin <admin@mygarage.io>', // A more professional "from" address
+    from: 'MyGarage Admin <admin@mygarage.io>',
     to: options.email,
     subject: options.subject,
-    text: options.message,
-    // html:
+    // --- THIS IS THE CHANGE ---
+    text: options.text, // The plain text version of the message
+    html: options.html, // The HTML version of the message
   };
 
   // 3) Actually send the email

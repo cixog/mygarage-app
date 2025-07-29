@@ -1,4 +1,3 @@
-// server/controllers/authController.js (Corrected with ES Modules)
 import crypto from 'crypto';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
@@ -48,36 +47,40 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-// Helper to send the verification email
-const sendVerificationEmail = async (user, req) => {
-  const verificationToken = user.createEmailVerificationToken();
-  await user.save({ validateBeforeSave: false });
-
-  // Use the frontend's URL structure for the verification link
-  const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
-
-  const message = `Welcome to MyGarage! Please verify your email address by clicking this link: ${verificationURL}.\nIf you did not sign up, please ignore this email.`;
-
-  try {
-    await sendEmail({
-      email: user.email,
-      subject: 'MyGarage: Please Verify Your Email Address',
-      message,
-    });
-  } catch (err) {
-    console.error('EMAIL SENDING ERROR:', err);
-  }
-};
-
 // --- CORE AUTH CONTROLLERS ---
 
 export const signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
+  const newUser = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+  });
 
-  // Send the verification email
-  await sendVerificationEmail(newUser, req);
+  const verificationToken = newUser.createEmailVerificationToken();
+  await newUser.save();
 
-  // Respond to the user telling them to check their email
+  const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
+  const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
+  const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
+
+  try {
+    await sendEmail({
+      email: newUser.email,
+      subject: 'MyGarage: Please Verify Your Email Address',
+      text: textMessage,
+      html: htmlMessage,
+    });
+  } catch (err) {
+    await User.findByIdAndDelete(newUser._id);
+    return next(
+      new AppError(
+        'Failed to send verification email. Please use a valid email address and try again.',
+        502
+      )
+    );
+  }
+
   res.status(201).json({
     status: 'success',
     message: 'Account created! Please check your email to verify your account.',
@@ -97,9 +100,25 @@ export const login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  // Check if the user has verified their email
   if (!user.isVerified) {
-    await sendVerificationEmail(user, req); // Resend the email
+    const verificationToken = user.createEmailVerificationToken();
+    await user.save({ validateBeforeSave: false });
+
+    const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
+    const textMessage = `We noticed you tried to log in, but your account isn't verified. Please copy and paste this link to verify:\n\n${verificationURL}`;
+    const htmlMessage = `<p>We noticed you tried to log in, but your account isn't verified. Please <a href="${verificationURL}">click here to verify your email address</a>.</p>`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'MyGarage: Account Verification Required',
+        text: textMessage,
+        html: htmlMessage,
+      });
+    } catch (err) {
+      console.error('LOGIN-VERIFICATION EMAIL FAILED:', err);
+    }
+
     return next(
       new AppError(
         'Your account is not verified. A new verification email has been sent.',
@@ -131,11 +150,18 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
   user.emailVerificationExpires = undefined;
   await user.save();
 
-  // Automatically log the user in after successful verification
   createSendToken(user, 200, res);
 });
 
-// --- MIDDLEWARE & OTHER CONTROLLERS ---
+export const logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
+// --- MIDDLEWARE & SECURITY ---
 
 export const protect = catchAsync(async (req, res, next) => {
   let token;
@@ -184,11 +210,11 @@ export const restrictTo = (...roles) => {
   };
 };
 
+// --- PASSWORD MANAGEMENT ---
+
 export const forgotPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    // For security, don't reveal if a user exists.
-    // Send a success response either way.
     return res
       .status(200)
       .json({ status: 'success', message: 'Token sent to email.' });
@@ -198,13 +224,15 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
-  const message = `Forgot your password? Click this link to reset it: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+  const textMessage = `Forgot your password? Copy and paste this link to reset it (valid for 10 minutes):\n\n${resetURL}\n\nIf you didn't forget your password, please ignore this email!`;
+  const htmlMessage = `<p>Forgot your password? Please <a href="${resetURL}">click here to reset your password</a> (the link is valid for 10 minutes).</p><p>If you didn't request this, please ignore this email.</p>`;
 
   try {
     await sendEmail({
       email: user.email,
       subject: 'Your password reset token (valid for 10 minutes)',
-      message,
+      text: textMessage,
+      html: htmlMessage,
     });
     res
       .status(200)
@@ -222,6 +250,7 @@ export const resetPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
+
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
@@ -252,11 +281,3 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 200, res);
 });
-
-export const logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
-  });
-  res.status(200).json({ status: 'success' });
-};
