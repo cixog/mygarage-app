@@ -45,7 +45,7 @@ export default function GarageCard({ garage }) {
           {/* --- THIS IS THE FIX --- */}
           {/* We now safely access the 'address' property of the location object */}
           <span className="text-xs text-gray-500">
-            {garage.location?.address || ''}
+            {garage.user?.location || 'Location not set'}
           </span>
         </div>
       </div>

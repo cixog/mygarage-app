@@ -63,11 +63,17 @@ const garageSchema = new mongoose.Schema(
   }
 );
 
+// --- ADD THIS VIRTUAL PROPERTY ---
+// This calculates the number of vehicles in the garage and adds it as 'vehicleCount'.
+garageSchema.virtual('vehicleCount').get(function () {
+  return this.vehicles ? this.vehicles.length : 0;
+});
+
 // QUERY MIDDLEWARE: This ensures we only find garages of ACTIVE users.
 garageSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
-    select: 'name avatar followers',
+    select: 'name avatar followers location',
     // Only populate the 'user' field if the user has `active: true`
     match: { active: { $ne: false } },
   });

@@ -8,30 +8,30 @@ import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
 import APIFeatures from '../utils/apiFeatures.js';
 
-// This new, smarter controller replaces factory.getAll(Garage)
 export const getAllGarages = catchAsync(async (req, res, next) => {
-  // 1. Use APIFeatures to get the correct set of garages (newest, featured, etc.)
-  // We populate 'vehicles' with just their cover photos to be efficient.
   const features = new APIFeatures(
+    // --- THIS IS THE FIX ---
+    // The Garage model's middleware automatically populates the 'user' field for us.
+    // We MUST ALSO explicitly populate the 'vehicles' field here so we can find the cover photo.
     Garage.find().populate({
       path: 'vehicles',
-      select: 'coverPhoto', // Select only the field we need
+      select: 'coverPhoto', // Be efficient, we only need the coverPhoto from the vehicle
     }),
     req.query
   )
     .filter()
-    .sort() // This will now work correctly with the updated schema
+    .sort()
     .limitFields()
     .paginate();
 
   const garages = await features.query;
 
-  // 2. --- THIS IS THE CRITICAL DATA CORRECTION STEP ---
-  // Post-process the results to ensure the cover photo is always valid.
+  // This logic will now work correctly again because `garage.vehicles` is populated.
   const correctedGarages = garages.map(garage => {
-    const garageObj = garage.toObject(); // Work with a plain object
+    // The .toObject() is crucial because virtual properties (like vehicleCount)
+    // are only present on plain objects, not Mongoose documents by default.
+    const garageObj = garage.toObject();
 
-    // If the garage has vehicles with cover photos, its cover MUST be the cover of its first vehicle.
     if (
       garageObj.vehicles &&
       garageObj.vehicles.length > 0 &&
@@ -39,13 +39,11 @@ export const getAllGarages = catchAsync(async (req, res, next) => {
     ) {
       garageObj.coverPhoto = garageObj.vehicles[0].coverPhoto;
     } else {
-      // If the garage has NO vehicles, it MUST use the default image.
       garageObj.coverPhoto = 'default-garage-cover.jpg';
     }
     return garageObj;
   });
 
-  // 3. Send the corrected and verified data to the client.
   res.status(200).json({
     status: 'success',
     results: correctedGarages.length,
@@ -55,7 +53,6 @@ export const getAllGarages = catchAsync(async (req, res, next) => {
   });
 });
 
-// The rest of your controller functions remain the same.
 export const getGarage = catchAsync(async (req, res, next) => {
   const garage = await Garage.findById(req.params.id)
     .populate({
