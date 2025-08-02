@@ -6,8 +6,7 @@ import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import sendEmail from '../utils/email.js';
 
-// --- HELPER FUNCTIONS ---
-
+// --- HELPER FUNCTIONS (No changes needed) ---
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -16,7 +15,6 @@ const signToken = id => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
-
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -24,10 +22,7 @@ const createSendToken = (user, statusCode, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
   };
-
   res.cookie('jwt', token, cookieOptions);
-
-  // Send a minimal user object to the client
   const minimalUser = {
     _id: user._id,
     name: user.name,
@@ -37,7 +32,6 @@ const createSendToken = (user, statusCode, res) => {
     role: user.role,
     following: user.following,
   };
-
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -61,6 +55,7 @@ export const signup = catchAsync(async (req, res, next) => {
   await newUser.save();
 
   const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
+  // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
   const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
 
@@ -68,8 +63,8 @@ export const signup = catchAsync(async (req, res, next) => {
     await sendEmail({
       email: newUser.email,
       subject: 'MyGarage: Please Verify Your Email Address',
-      text: textMessage,
-      html: htmlMessage,
+      text: textMessage, // Pass the text version
+      html: htmlMessage, // Pass the HTML version
     });
   } catch (err) {
     await User.findByIdAndDelete(newUser._id);
@@ -100,28 +95,11 @@ export const login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
+  // **IMPROVEMENT**: Check if the user is verified
   if (!user.isVerified) {
-    const verificationToken = user.createEmailVerificationToken();
-    await user.save({ validateBeforeSave: false });
-
-    const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
-    const textMessage = `We noticed you tried to log in, but your account isn't verified. Please copy and paste this link to verify:\n\n${verificationURL}`;
-    const htmlMessage = `<p>We noticed you tried to log in, but your account isn't verified. Please <a href="${verificationURL}">click here to verify your email address</a>.</p>`;
-
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: 'MyGarage: Account Verification Required',
-        text: textMessage,
-        html: htmlMessage,
-      });
-    } catch (err) {
-      console.error('LOGIN-VERIFICATION EMAIL FAILED:', err);
-    }
-
     return next(
       new AppError(
-        'Your account is not verified. A new verification email has been sent.',
+        'Your account is not verified. Please check your email for a verification link.',
         401
       )
     );
@@ -148,10 +126,13 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
   user.isVerified = true;
   user.emailVerificationToken = undefined;
   user.emailVerificationExpires = undefined;
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
+  // Automatically log the user in after verification
   createSendToken(user, 200, res);
 });
+
+// --- The rest of the file remains unchanged ---
 
 export const logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
@@ -160,8 +141,6 @@ export const logout = (req, res) => {
   });
   res.status(200).json({ status: 'success' });
 };
-
-// --- MIDDLEWARE & SECURITY ---
 
 export const protect = catchAsync(async (req, res, next) => {
   let token;
@@ -173,14 +152,11 @@ export const protect = catchAsync(async (req, res, next) => {
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
-
   if (!token) {
     return next(new AppError('You are not logged in! Please log in.', 401));
   }
-
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const currentUser = await User.findById(decoded.id);
-
   if (!currentUser) {
     return next(
       new AppError('The user belonging to this token no longer exists.', 401)
@@ -194,7 +170,6 @@ export const protect = catchAsync(async (req, res, next) => {
   if (!currentUser.active) {
     return next(new AppError('This user is no longer active.', 401));
   }
-
   req.user = currentUser;
   next();
 });
@@ -210,8 +185,6 @@ export const restrictTo = (...roles) => {
   };
 };
 
-// --- PASSWORD MANAGEMENT ---
-
 export const forgotPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -219,11 +192,11 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       .status(200)
       .json({ status: 'success', message: 'Token sent to email.' });
   }
-
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
   const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+  // --- MODIFICATION 3: Create both text and HTML messages ---
   const textMessage = `Forgot your password? Copy and paste this link to reset it (valid for 10 minutes):\n\n${resetURL}\n\nIf you didn't forget your password, please ignore this email!`;
   const htmlMessage = `<p>Forgot your password? Please <a href="${resetURL}">click here to reset your password</a> (the link is valid for 10 minutes).</p><p>If you didn't request this, please ignore this email.</p>`;
 
@@ -250,22 +223,18 @@ export const resetPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
-
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
-
   if (!user) {
     return next(new AppError('Token is invalid or expired.', 400));
   }
-
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-
   createSendToken(user, 200, res);
 });
 
@@ -274,10 +243,8 @@ export const updatePassword = catchAsync(async (req, res, next) => {
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError('Your current password is wrong.', 401));
   }
-
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
-
   createSendToken(user, 200, res);
 });

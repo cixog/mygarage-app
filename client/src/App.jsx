@@ -6,10 +6,12 @@ import Footer from './components/Footer';
 import SettingsPage from './pages/SettingsPage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 // Page Imports (CreateGaragePage is now gone)
 import Home from './pages/Home';
 import Signup from './pages/Signup';
+
 import Onboarding from './pages/Onboarding';
 import AllGarages from './pages/AllGarages';
 import GarageProfilePage from './pages/GarageProfilePage';
@@ -44,6 +46,7 @@ function App() {
             {/* --- Public Routes --- */}
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route
               path="/reset-password/:token"

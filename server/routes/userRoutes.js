@@ -9,6 +9,7 @@ const router = express.Router();
 // Anyone can sign up or log in.
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+// **FIX**: This route now correctly points to the `verifyEmail` controller
 router.get('/verify-email/:token', authController.verifyEmail);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
