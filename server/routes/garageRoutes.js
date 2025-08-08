@@ -10,6 +10,8 @@ const router = express.Router();
 // Any request to /garages/:garageId/reviews will be handled by the reviewRouter
 router.use('/:garageId/reviews', reviewRouter);
 
+router.get('/random', garageController.getRandomGarages);
+
 // --- Public Routes ---
 router.route('/').get(garageController.getAllGarages);
 

@@ -1,5 +1,5 @@
 // client/src/App.jsx (Corrected)
-
+import { lazy, Suspense } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -11,7 +11,6 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 // Page Imports (CreateGaragePage is now gone)
 import Home from './pages/Home';
 import Signup from './pages/Signup';
-
 import Onboarding from './pages/Onboarding';
 import AllGarages from './pages/AllGarages';
 import GarageProfilePage from './pages/GarageProfilePage';
@@ -30,7 +29,11 @@ import EventsListPage from './pages/EventsListPage';
 import SubmitEventPage from './pages/SubmitEventPage';
 import EventDetailPage from './pages/EventDetailPage';
 import AdminTicketsPage from './pages/AdminTicketsPage';
-import MapSearchPage from './pages/MapSearchPage';
+// import MapSearchPage from './pages/MapSearchPage';
+
+// 👇 --- 2. CHANGE THE MAPBOX IMPORT TO BE LAZY --- 👇
+// This tells React to only fetch the code for MapSearchPage when it's needed.
+const MapSearchPage = lazy(() => import('./pages/MapSearchPage'));
 
 // Component Imports
 import ProtectedRoute from './components/ProtectedRoute';
@@ -63,7 +66,19 @@ function App() {
             <Route path="/sitemap" element={<SiteMap />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/:eventId" element={<EventDetailPage />} />
-            <Route path="/map-search" element={<MapSearchPage />} />
+
+            <Route
+              path="/map-search"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="text-center p-10">Loading map...</div>
+                  }
+                >
+                  <MapSearchPage />
+                </Suspense>
+              }
+            />
 
             {/* --- Protected Routes --- */}
             <Route element={<ProtectedRoute />}>

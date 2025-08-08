@@ -55,11 +55,23 @@ export const resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 export const getFeedPhotos = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id);
-  const followingIds = [...user.following, req.user.id]; // Include user's own photos
+
+  const followingIds = user.following;
+
+  // If the user isn't following anyone, we can stop early.
+  if (!followingIds || followingIds.length === 0) {
+    return res.status(200).json({
+      status: 'success',
+      results: 0,
+      data: { photos: [] }, // Send back an empty array
+    });
+  }
+
   const photos = await Photo.find({ user: { $in: followingIds } })
     .populate({ path: 'user', select: 'name avatar' })
     .sort({ createdAt: -1 })
     .limit(50);
+
   res
     .status(200)
     .json({ status: 'success', results: photos.length, data: { photos } });

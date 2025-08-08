@@ -1,6 +1,6 @@
 // server/models/garageModel.js
 import mongoose from 'mongoose';
-import slugify from 'slugify';
+//import slugify from 'slugify';
 
 const garageSchema = new mongoose.Schema(
   {
@@ -81,15 +81,15 @@ garageSchema.pre(/^find/, function (next) {
 });
 
 // POST-QUERY MIDDLEWARE: Clean up results where the user was filtered out.
-garageSchema.post(/^find/, function (docs, next) {
-  if (Array.isArray(docs)) {
-    // Remove any garage where `user` is null because the `match` condition failed
-    const filteredDocs = docs.filter(doc => doc.user !== null);
-    docs.length = 0; // Clear the original array
-    docs.push(...filteredDocs); // Push the filtered documents back
-  }
-  next();
-});
+// garageSchema.post(/^find/, function (docs, next) {
+//   if (Array.isArray(docs)) {
+//     // Remove any garage where `user` is null because the `match` condition failed
+//     const filteredDocs = docs.filter(doc => doc.user !== null);
+//     docs.length = 0; // Clear the original array
+//     docs.push(...filteredDocs); // Push the filtered documents back
+//   }
+//   next();
+// });
 
 const Garage = mongoose.model('Garage', garageSchema);
 export default Garage;

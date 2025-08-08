@@ -117,32 +117,6 @@ export const deleteVehicle = catchAsync(async (req, res, next) => {
     await Photo.deleteMany({ _id: { $in: vehicle.photos } });
   }
 
-  // --- THIS IS THE NEW, CRITICAL LOGIC ---
-  const parentGarage = await Garage.findById(vehicle.garage);
-
-  // Remove vehicle reference from the garage
-  if (parentGarage) {
-    parentGarage.vehicles.pull(vehicle._id);
-
-    // Check if the deleted vehicle was the cover
-    if (parentGarage.coverPhoto === vehicle.coverPhoto) {
-      if (parentGarage.vehicles.length > 0) {
-        // If there are other vehicles, set the cover to the first remaining one
-        const newCoverVehicle = await Vehicle.findById(
-          parentGarage.vehicles[0]
-        );
-        parentGarage.coverPhoto = newCoverVehicle
-          ? newCoverVehicle.coverPhoto
-          : 'default-garage-cover.jpg';
-      } else {
-        // If no vehicles are left, set to default
-        parentGarage.coverPhoto = 'default-garage-cover.jpg';
-      }
-    }
-    await parentGarage.save();
-  }
-  // --- END OF NEW LOGIC ---
-
   // Delete the vehicle document itself
   await Vehicle.findByIdAndDelete(req.params.id);
 
@@ -175,23 +149,9 @@ export const setVehicleCoverPhoto = catchAsync(async (req, res, next) => {
   vehicle.coverPhoto = photoFilename;
   await vehicle.save();
 
-  // --- THIS IS THE NEW, CRITICAL LOGIC ---
-  // 3. Find the parent garage
-  const parentGarage = await Garage.findById(vehicle.garage);
-  if (parentGarage) {
-    // 4. Get the ID of the very first vehicle in the garage's list
-    const firstVehicleId = parentGarage.vehicles[0]?.toString();
+  // 3. THAT'S IT! We no longer try to sync the parent garage here.
+  //    We will derive the garage cover photo correctly in the garageController.
 
-    // 5. Check if the vehicle we just updated IS the first vehicle
-    if (vehicleId === firstVehicleId) {
-      // 6. If it is, update the GARAGE's cover photo to match.
-      parentGarage.coverPhoto = photoFilename;
-      await parentGarage.save();
-    }
-  }
-  // --- END OF NEW LOGIC ---
-
-  // 7. Send success response
   res.status(200).json({
     status: 'success',
     data: {
@@ -221,6 +181,31 @@ export const toggleLike = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       vehicle: updatedVehicle,
+    },
+  });
+});
+
+export const getLatestVehicles = catchAsync(async (req, res, next) => {
+  const limit = req.query.limit * 1 || 8;
+
+  // Find vehicles and sort by the `updatedAt` field in descending order
+  const vehicles = await Vehicle.find()
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .populate({
+      path: 'garage',
+      select: 'name user',
+      populate: {
+        path: 'user',
+        select: 'name',
+      },
+    });
+
+  res.status(200).json({
+    status: 'success',
+    results: vehicles.length,
+    data: {
+      data: vehicles,
     },
   });
 });

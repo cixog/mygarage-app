@@ -43,7 +43,7 @@ export default function ReviewList({ garageId }) {
           <Link to={`/profile/${review.user._id}`}>
             <img
               src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
-                review.user.photo || 'default.jpg'
+                review.user.avatar || 'default.jpg'
               }`}
               alt={review.user.name}
               className="w-12 h-12 rounded-full object-cover"

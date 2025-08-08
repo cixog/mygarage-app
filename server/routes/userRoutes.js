@@ -19,6 +19,7 @@ router.patch('/resetPassword/:token', authController.resetPassword);
 router.use(authController.protect);
 
 // --- LOGGED-IN USER ROUTES (acting on their own account) ---
+router.get('/me/followed-garages', userController.getFollowedGarages);
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser); // Special route to get current user
 router.patch(

@@ -15,7 +15,7 @@ const About = () => {
       </p>
 
       <p className="mb-4 text-lg leading-relaxed">
-        MyGarage is a fun, easygoing space where you can build your own{' '}
+        MyTinHouse is a fun, easygoing space where you can build your own{' '}
         <em>virtual garage</em>. Snap a few photos, upload your favorite rides,
         and show off your collection to the world. Each user gets a personalized
         page where they can post vehicle pics, add descriptions, and tell the
@@ -41,7 +41,7 @@ const About = () => {
       </p>
 
       <p className="mb-4 text-lg leading-relaxed">
-        At MyGarage, it’s all about sharing the passion. So come on in, park
+        At MyTinHouse, it’s all about sharing the passion. So come on in, park
         your photos, and cruise around a bit. You’re in good company.
       </p>
     </div>

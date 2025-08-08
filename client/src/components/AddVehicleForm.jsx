@@ -15,6 +15,8 @@ export default function AddVehicleForm({ onVehicleAdded }) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isFormInvalid = !formData.make || !formData.model || !formData.year;
+
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -130,7 +132,8 @@ export default function AddVehicleForm({ onVehicleAdded }) {
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        // Add isFormInvalid to the disabled check
+        disabled={isSubmitting || isFormInvalid}
         className="btn w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
       >
         {isSubmitting ? 'Adding...' : 'Add Vehicle'}

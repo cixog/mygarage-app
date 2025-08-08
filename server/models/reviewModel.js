@@ -41,7 +41,7 @@ reviewSchema.index({ garage: 1, user: 1 }, { unique: true });
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
-    select: 'name photo',
+    select: 'name avatar',
   });
   next();
 });

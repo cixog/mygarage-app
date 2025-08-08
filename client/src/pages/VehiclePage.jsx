@@ -140,6 +140,8 @@ export default function VehiclePage() {
     try {
       await api.patch(`/vehicles/${vehicleId}/set-cover`, { photoFilename });
       toast.success('Cover photo updated!');
+      // 👇 --- ADD THIS LINE --- 👇
+      fetchPageData(); // This re-syncs the entire page with the database
     } catch (err) {
       setVehicle(prev => ({ ...prev, coverPhoto: originalCover }));
       toast.error('Failed to update cover photo.');

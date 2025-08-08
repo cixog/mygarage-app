@@ -102,6 +102,52 @@ export const unfollow = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: 'success', message: 'User unfollowed.' });
 });
 
+export const getFollowedGarages = catchAsync(async (req, res, next) => {
+  // 1. Get the list of user IDs the current user is following.
+  const user = await User.findById(req.user.id);
+  const { following } = user;
+
+  // 2. If the user isn't following anyone, return an empty array.
+  if (!following || following.length === 0) {
+    return res.status(200).json({
+      status: 'success',
+      results: 0,
+      data: { data: [] },
+    });
+  }
+
+  // 3. Find all garages where the owner ('user') is in the 'following' list.
+  //    We also populate the data needed for the GarageCard component.
+  const garages = await Garage.find({ user: { $in: following } }).populate({
+    path: 'vehicles',
+    select: 'coverPhoto',
+  });
+
+  // 4. Correctly format the garage data before sending it
+  const correctedGarages = garages.map(garage => {
+    const garageObj = garage.toObject();
+    if (
+      garageObj.vehicles &&
+      garageObj.vehicles.length > 0 &&
+      garageObj.vehicles[0].coverPhoto
+    ) {
+      garageObj.coverPhoto = garageObj.vehicles[0].coverPhoto;
+    } else {
+      garageObj.coverPhoto = 'default-garage-cover.jpg';
+    }
+    return garageObj;
+  });
+
+  // 5. Send the formatted list of garages as the response.
+  res.status(200).json({
+    status: 'success',
+    results: correctedGarages.length,
+    data: {
+      data: correctedGarages,
+    },
+  });
+});
+
 // Factory handlers for admin purposes
 export const getAllUsers = factory.getAll(User);
 export const getUser = factory.getOne(User, { path: 'garage' }); // Populate garage details

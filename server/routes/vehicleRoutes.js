@@ -10,6 +10,8 @@ const router = express.Router();
 
 router.use('/:vehicleId/comments', commentRouter);
 
+router.get('/latest', vehicleController.getLatestVehicles);
+
 router.get('/:id', vehicleController.getVehicle);
 
 router.use(authController.protect);
