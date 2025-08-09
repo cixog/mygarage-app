@@ -1,17 +1,31 @@
-/dev-data
-/node_modules
+# .gitignore (in the root of your project)
+
+# Dependencies
+node_modules
+/client/node_modules
+/server/node_modules
+
+# Build output from Vite
+/client/dist
+
+# Logs
+logs
 *.log
-config.env
-public
+npm-debug.log*
+
+# Environment variables
 .env
+/server/config.env
+/client/.env
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Misc
 ToDo.txt
 notes.txt
 PROJECT_SNAPSHOT.md
-/dist
-/build
-.DS_Store
-Thumbs.db
 .parcel-cache
-.next
-.vscode
-*.log
