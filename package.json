@@ -5,7 +5,9 @@
   "scripts": {
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm install --prefix client && npm run build --prefix client",
+    "start": "npm start --prefix server"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +15,8 @@
   "description": "",
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "concurrently": "^9.2.0"
+    "concurrently": "^9.2.0",
+    "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
     "postcss": "^8.4.38"

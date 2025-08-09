@@ -1,14 +1,16 @@
-// client/src/App.jsx (Corrected)
+// client/src/App.jsx (Final and Correct)
 import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+
+// 1. Import from the library and your functional fallback component
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from './components/ErrorFallback';
+
+// Your Component/Page Imports
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import SettingsPage from './pages/SettingsPage';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-
-// Page Imports (CreateGaragePage is now gone)
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
@@ -29,14 +31,11 @@ import EventsListPage from './pages/EventsListPage';
 import SubmitEventPage from './pages/SubmitEventPage';
 import EventDetailPage from './pages/EventDetailPage';
 import AdminTicketsPage from './pages/AdminTicketsPage';
-// import MapSearchPage from './pages/MapSearchPage';
-
-// 👇 --- 2. CHANGE THE MAPBOX IMPORT TO BE LAZY --- 👇
-// This tells React to only fetch the code for MapSearchPage when it's needed.
-const MapSearchPage = lazy(() => import('./pages/MapSearchPage'));
-
-// Component Imports
+import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+
+const MapSearchPage = lazy(() => import('./pages/MapSearchPage'));
 
 function App() {
   return (
@@ -45,55 +44,63 @@ function App() {
         <Toaster position="top-center" />
         <Navbar />
         <main>
-          <Routes>
-            {/* --- Public Routes --- */}
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route
-              path="/reset-password/:token"
-              element={<ResetPasswordPage />}
-            />
-            <Route path="/garages" element={<AllGarages />} />
-            <Route path="/garages/:garageId" element={<GarageProfilePage />} />
-            <Route path="/vehicles/:vehicleId" element={<VehiclePage />} />
-            <Route path="/profile/:userId" element={<UserProfileRedirect />} />
-            <Route path="/no-garage" element={<NoGaragePage />} />
-            <Route path="/search" element={<SearchResultsPage />} />
-            <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/toolbox" element={<ToolBox />} />
-            <Route path="/sitemap" element={<SiteMap />} />
-            <Route path="/events" element={<EventsListPage />} />
-            <Route path="/events/:eventId" element={<EventDetailPage />} />
-
-            <Route
-              path="/map-search"
-              element={
-                <Suspense
-                  fallback={
-                    <div className="text-center p-10">Loading map...</div>
-                  }
-                >
-                  <MapSearchPage />
-                </Suspense>
+          {/* 2. This is the correct, global placement of the ErrorBoundary */}
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense
+              fallback={
+                <div className="text-center p-10 font-semibold">
+                  Loading Page...
+                </div>
               }
-            />
+            >
+              <Routes>
+                {/* All of your existing routes go here, unchanged */}
+                <Route path="/" element={<Home />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route
+                  path="/verify-email/:token"
+                  element={<VerifyEmailPage />}
+                />
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPasswordPage />}
+                />
+                <Route
+                  path="/reset-password/:token"
+                  element={<ResetPasswordPage />}
+                />
+                <Route path="/garages" element={<AllGarages />} />
+                <Route
+                  path="/garages/:garageId"
+                  element={<GarageProfilePage />}
+                />
+                <Route path="/vehicles/:vehicleId" element={<VehiclePage />} />
+                <Route
+                  path="/profile/:userId"
+                  element={<UserProfileRedirect />}
+                />
+                <Route path="/no-garage" element={<NoGaragePage />} />
+                <Route path="/search" element={<SearchResultsPage />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/toolbox" element={<ToolBox />} />
+                <Route path="/sitemap" element={<SiteMap />} />
+                <Route path="/events" element={<EventsListPage />} />
+                <Route path="/events/:eventId" element={<EventDetailPage />} />
+                <Route path="/map-search" element={<MapSearchPage />} />
 
-            {/* --- Protected Routes --- */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/onboarding" element={<Onboarding />} />
-              {/* The /create-garage route is now gone */}
-              <Route path="/profile" element={<UserProfileRedirect />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/tickets" element={<AdminTicketsPage />} />
-              <Route path="/events/submit" element={<SubmitEventPage />} />
-            </Route>
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/profile" element={<UserProfileRedirect />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+                  <Route path="/events/submit" element={<SubmitEventPage />} />
+                </Route>
 
-            {/* --- Catch-all route for 404 Not Found --- */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </main>
         <Footer />
       </div>
