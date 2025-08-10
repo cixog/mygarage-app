@@ -54,7 +54,7 @@ export const signup = catchAsync(async (req, res, next) => {
   const verificationToken = newUser.createEmailVerificationToken();
   await newUser.save();
 
-  const verificationURL = `http://localhost:5173/verify-email/${verificationToken}`;
+  const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
   // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
   const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
@@ -195,7 +195,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+  const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
   // --- MODIFICATION 3: Create both text and HTML messages ---
   const textMessage = `Forgot your password? Copy and paste this link to reset it (valid for 10 minutes):\n\n${resetURL}\n\nIf you didn't forget your password, please ignore this email!`;
   const htmlMessage = `<p>Forgot your password? Please <a href="${resetURL}">click here to reset your password</a> (the link is valid for 10 minutes).</p><p>If you didn't request this, please ignore this email.</p>`;
