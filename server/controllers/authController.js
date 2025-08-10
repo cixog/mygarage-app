@@ -44,6 +44,7 @@ const createSendToken = (user, statusCode, res) => {
 // --- CORE AUTH CONTROLLERS ---
 
 export const signup = catchAsync(async (req, res, next) => {
+  console.log('--- SIGNUP PROCESS STARTED ---');
   const newUser = new User({
     name: req.body.name,
     email: req.body.email,
@@ -53,21 +54,27 @@ export const signup = catchAsync(async (req, res, next) => {
 
   const verificationToken = newUser.createEmailVerificationToken();
   await newUser.save();
+  console.log(`User ${newUser.email} SAVED to database with ID ${newUser._id}`);
 
   const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
-  // --- MODIFICATION 1: Create both text and HTML messages ---
-  const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
-  const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
+  const textMessage = `...`;
+  const htmlMessage = `...`;
 
   try {
+    console.log(`Attempting to send verification email to ${newUser.email}...`);
     await sendEmail({
       email: newUser.email,
       subject: 'MyGarage: Please Verify Your Email Address',
-      text: textMessage, // Pass the text version
-      html: htmlMessage, // Pass the HTML version
+      text: textMessage,
+      html: htmlMessage,
     });
+    console.log(`Email sent successfully to ${newUser.email}.`);
   } catch (err) {
-    await User.findByIdAndDelete(newUser._id); // User is deleted if email fails!
+    console.error('---!!! EMAIL SENDING FAILED !!!---');
+    console.error(err); // Log the full error object from nodemailer
+    console.log(`Deleting user ${newUser.email} due to email failure.`);
+    await User.findByIdAndDelete(newUser._id);
+    console.log(`User ${newUser.email} DELETED.`);
     return next(
       new AppError(
         'Failed to send verification email. Please use a valid email address and try again.',
@@ -76,6 +83,7 @@ export const signup = catchAsync(async (req, res, next) => {
     );
   }
 
+  console.log('--- SIGNUP PROCESS COMPLETED SUCCESSFULLY ---');
   res.status(201).json({
     status: 'success',
     message: 'Account created! Please check your email to verify your account.',
