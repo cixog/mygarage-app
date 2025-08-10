@@ -67,7 +67,7 @@ export const signup = catchAsync(async (req, res, next) => {
       html: htmlMessage, // Pass the HTML version
     });
   } catch (err) {
-    await User.findByIdAndDelete(newUser._id);
+    await User.findByIdAndDelete(newUser._id); // User is deleted if email fails!
     return next(
       new AppError(
         'Failed to send verification email. Please use a valid email address and try again.',
