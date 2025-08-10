@@ -136,8 +136,10 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
   user.emailVerificationExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
+  const verifiedUser = await User.findById(user._id).populate('garage');
+
   // Automatically log the user in after verification
-  createSendToken(user, 200, res);
+  createSendToken(verifiedUser, 200, res);
 });
 
 // --- The rest of the file remains unchanged ---
