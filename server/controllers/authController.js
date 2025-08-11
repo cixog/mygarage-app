@@ -57,16 +57,16 @@ export const signup = catchAsync(async (req, res, next) => {
   console.log(`User ${newUser.email} SAVED to database with ID ${newUser._id}`);
 
   const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
-  const textMessage = `...`;
-  const htmlMessage = `...`;
+  const textMessage = `Welcome to MyGarage! Please verify your email address by clicking the following link (the link is valid for 24 hours): ${verificationURL}`;
+  const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>The link is valid for 24 hours.</p>`;
 
   try {
     console.log(`Attempting to send verification email to ${newUser.email}...`);
     await sendEmail({
       email: newUser.email,
       subject: 'MyGarage: Please Verify Your Email Address',
-      text: textMessage,
-      html: htmlMessage,
+      text: textMessage, // Pass the defined text message
+      html: htmlMessage, // Pass the defined HTML message
     });
     console.log(`Email sent successfully to ${newUser.email}.`);
   } catch (err) {
