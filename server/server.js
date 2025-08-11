@@ -18,10 +18,36 @@ import app from './app.js';
 // Connect to the database
 const DB = process.env.DATABASE;
 
+// Check if the DATABASE variable is even being loaded by Render
+if (!DB) {
+  console.error('FATAL ERROR: DATABASE environment variable not found!');
+  process.exit(1); // Stop the server if the connection string is missing
+}
+
+console.log('Attempting to connect to MongoDB Atlas...');
+console.log(
+  `(Using connection string starting with: ${DB.substring(0, 25)}...)`
+); // Log a snippet for verification
+
 mongoose
   .connect(DB)
-  .then(() => console.log('DB connection successful!'))
-  .catch(err => console.error('DB Connection Error:', err));
+  .then(() => console.log('✅ DB connection successful!')) // <-- SUCCESS MESSAGE
+  .catch(err => {
+    // <-- FAILURE MESSAGE
+    console.error('❌ DB Connection Error:', err.message);
+    // Add a more detailed reason for common errors
+    if (err.name === 'MongoNetworkError') {
+      console.error(
+        'Hint: This often means a firewall or IP whitelist issue in MongoDB Atlas.'
+      );
+    }
+    if (err.name === 'MongooseServerSelectionError') {
+      console.error(
+        'Hint: Check your connection string, password, and IP whitelist.'
+      );
+    }
+  });
+// --- END OF TEST SECTION ---
 
 // Start the server
 const port = process.env.PORT || 3000;

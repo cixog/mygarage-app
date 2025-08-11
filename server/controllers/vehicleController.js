@@ -27,7 +27,6 @@ export const createVehicle = catchAsync(async (req, res, next) => {
   }
 
   const vehicleData = { ...req.body };
-  delete vehicleData.photos; // Temporarily remove photos array
 
   vehicleData.user = req.user.id;
   vehicleData.garage = garage._id;
