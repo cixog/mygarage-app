@@ -24,8 +24,7 @@ router.get('/feed', photoController.getFeedPhotos);
 // Route for uploading new photos for a vehicle.
 router.post(
   '/upload',
-  photoController.uploadUserPhoto,
-  photoController.resizeUserPhoto,
+  photoController.uploadVehiclePhotos,
   photoController.createPhoto
 );
 

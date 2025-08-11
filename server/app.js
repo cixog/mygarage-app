@@ -9,7 +9,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
+//import cors from 'cors';
 
 import AppError from './utils/AppError.js';
 import globalErrorHandler from './controllers/errorController.js';
@@ -29,22 +29,21 @@ const app = express();
 
 // 1. GLOBAL MIDDLEWARE
 app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'img-src': ["'self'", 'data:', 'res.cloudinary.com'],
+      },
+    },
+    // This is still needed to allow the frontend to display the images
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
 
 // We still use helmet for general security, but we will override its resource policy.
 app.use(helmet());
 
-// --- THIS IS THE DEFINITIVE FIX ---
-// This custom middleware manually sets the Cross-Origin-Resource-Policy header.
-// It will force the browser to allow your frontend to display the images.
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
-});
 // --- END OF FIX ---
 
 if (process.env.NODE_ENV === 'development') {

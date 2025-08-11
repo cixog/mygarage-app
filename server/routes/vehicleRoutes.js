@@ -3,7 +3,7 @@ import express from 'express';
 // --- All imports must use the .js extension ---
 import * as vehicleController from '../controllers/vehicleController.js';
 import * as authController from '../controllers/authController.js';
-import * as photoController from '../controllers/photoController.js';
+import { uploadVehiclePhotos } from '../controllers/photoController.js';
 import commentRouter from './commentRoutes.js';
 
 const router = express.Router();
@@ -19,11 +19,7 @@ router.use(authController.protect);
 router
   .route('/')
   .get(vehicleController.getAllVehicles)
-  .post(
-    photoController.uploadUserPhoto,
-    photoController.resizeUserPhoto,
-    vehicleController.createVehicle
-  );
+  .post(uploadVehiclePhotos, vehicleController.createVehicle);
 
 router.patch('/:id/set-cover', vehicleController.setVehicleCoverPhoto);
 router.patch('/:id/like', vehicleController.toggleLike);

@@ -1,42 +1,28 @@
-// server/controllers/userController.js (Corrected with ES Modules)
+// server/controllers/userController.js (Final Version with Cloudinary)
 import multer from 'multer';
-import sharp from 'sharp';
 import User from '../models/userModel.js';
 import Garage from '../models/garageModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
 
-// --- MULTER & SHARP CONFIGURATION ---
-const multerStorage = multer.memoryStorage();
+// --- 1. IMPORT the Cloudinary storage engine we created ---
+import { storage } from '../utils/cloudinary.js';
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
+// --- 2. CONFIGURE Multer to use Cloudinary for storage ---
+// Instead of saving to memory, multer will now stream the file directly
+// to Cloudinary using the storage engine we imported.
+const upload = multer({ storage: storage });
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-});
-
+// --- 3. EXPORT the Multer middleware for avatar uploads ---
+// The route will use this to intercept a file field named 'avatar'.
 export const uploadUserAvatar = upload.single('avatar');
 
-export const resizeUserAvatar = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
-  next();
-});
+// --- 4. DELETE the old resizeUserAvatar middleware ---
+// The entire `resizeUserAvatar` function is no longer needed because
+// Cloudinary handles image processing and storage. It should be fully removed.
 
-// --- CONTROLLER LOGIC ---
+// --- UTILITY and ROUTE-SPECIFIC CONTROLLERS ---
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach(el => {
@@ -56,7 +42,13 @@ export const updateMe = catchAsync(async (req, res, next) => {
     return next(new AppError('This route is not for password updates.', 400));
   }
   const filteredBody = filterObj(req.body, 'name', 'bio', 'location');
-  if (req.file) filteredBody.avatar = req.file.filename;
+
+  // --- 5. THE FIX: Get the image URL from Cloudinary ---
+  // If a file was uploaded, multer-storage-cloudinary provides its public URL
+  // in the `req.file.path` property. We save this full URL to the database.
+  if (req.file) {
+    filteredBody.avatar = req.file.path;
+  }
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
@@ -67,6 +59,44 @@ export const updateMe = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       user: updatedUser,
+    },
+  });
+});
+
+export const completeOnboarding = catchAsync(async (req, res, next) => {
+  if (req.user.garage) {
+    return next(new AppError('You have already completed onboarding.', 400));
+  }
+
+  const userUpdates = {
+    bio: req.body.about,
+    location: req.body.location,
+  };
+
+  // --- 6. THE FIX: Get the avatar URL from Cloudinary ---
+  // Same as updateMe, we get the permanent URL from `req.file.path`.
+  if (req.file) {
+    userUpdates.avatar = req.file.path;
+  }
+
+  const garageData = {
+    name: req.body.garageName,
+    description: req.body.about,
+    location: req.body.location,
+    user: req.user.id,
+  };
+
+  const newGarage = await Garage.create(garageData);
+  userUpdates.garage = newGarage._id;
+
+  await User.findByIdAndUpdate(req.user.id, userUpdates);
+
+  const finalUser = await User.findById(req.user.id).populate('garage');
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      user: finalUser,
     },
   });
 });
@@ -103,11 +133,9 @@ export const unfollow = catchAsync(async (req, res, next) => {
 });
 
 export const getFollowedGarages = catchAsync(async (req, res, next) => {
-  // 1. Get the list of user IDs the current user is following.
   const user = await User.findById(req.user.id);
   const { following } = user;
 
-  // 2. If the user isn't following anyone, return an empty array.
   if (!following || following.length === 0) {
     return res.status(200).json({
       status: 'success',
@@ -116,14 +144,11 @@ export const getFollowedGarages = catchAsync(async (req, res, next) => {
     });
   }
 
-  // 3. Find all garages where the owner ('user') is in the 'following' list.
-  //    We also populate the data needed for the GarageCard component.
   const garages = await Garage.find({ user: { $in: following } }).populate({
     path: 'vehicles',
     select: 'coverPhoto',
   });
 
-  // 4. Correctly format the garage data before sending it
   const correctedGarages = garages.map(garage => {
     const garageObj = garage.toObject();
     if (
@@ -138,7 +163,6 @@ export const getFollowedGarages = catchAsync(async (req, res, next) => {
     return garageObj;
   });
 
-  // 5. Send the formatted list of garages as the response.
   res.status(200).json({
     status: 'success',
     results: correctedGarages.length,
@@ -148,50 +172,8 @@ export const getFollowedGarages = catchAsync(async (req, res, next) => {
   });
 });
 
-// Factory handlers for admin purposes
+// --- ADMIN FACTORY HANDLERS (Unchanged) ---
 export const getAllUsers = factory.getAll(User);
-export const getUser = factory.getOne(User, { path: 'garage' }); // Populate garage details
+export const getUser = factory.getOne(User, { path: 'garage' });
 export const updateUser = factory.updateOne(User);
 export const deleteUser = factory.deleteOne(User);
-
-export const completeOnboarding = catchAsync(async (req, res, next) => {
-  // 1. Check if the user already has a garage to prevent duplicates
-  if (req.user.garage) {
-    return next(new AppError('You have already completed onboarding.', 400));
-  }
-
-  // 2. Prepare user updates (bio, location, and avatar if uploaded)
-  const userUpdates = {
-    bio: req.body.about, // We'll get 'about' from our new form
-    location: req.body.location,
-  };
-  if (req.file) userUpdates.avatar = req.file.filename;
-
-  // 3. Prepare garage data
-  const garageData = {
-    name: req.body.garageName,
-    description: req.body.about, // The 'about' field serves both purposes
-    location: req.body.location,
-    user: req.user.id,
-  };
-
-  // 4. Create the new garage
-  const newGarage = await Garage.create(garageData);
-  // 5. Add the new garage's ID to the user's document
-  userUpdates.garage = newGarage._id;
-
-  // 6. Instead of just updating, we find and update, and store the result
-  await User.findByIdAndUpdate(req.user.id, userUpdates);
-
-  // --- THIS IS THE FIX ---
-  // After updating the user, we find them again to ensure we can populate the new garage.
-  const finalUser = await User.findById(req.user.id).populate('garage');
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      // Send the fully populated user object back.
-      user: finalUser,
-    },
-  });
-});

@@ -25,14 +25,12 @@ router.get('/me', userController.getMe, userController.getUser); // Special rout
 router.patch(
   '/updateMe',
   userController.uploadUserAvatar,
-  userController.resizeUserAvatar,
   userController.updateMe
 );
 
 router.post(
   '/complete-onboarding',
   userController.uploadUserAvatar, // We can reuse the avatar upload middleware
-  userController.resizeUserAvatar, // and the resize middleware
   userController.completeOnboarding // This is the new controller function we will create
 );
 
