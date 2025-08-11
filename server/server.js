@@ -1,47 +1,54 @@
-// server/routes/userRoutes.js
-import express from 'express';
-import * as userController from '../controllers/userController.js';
-import * as authController from '../controllers/authController.js';
+// server/server.js (Correct and Final Version)
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const router = express.Router();
+// Handle any uncaught exceptions at the very top
+process.on('uncaughtException', err => {
+  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+  process.exit(1);
+});
 
-router.post('/signup', authController.signup);
-router.post('/login', authController.login);
-router.get('/verify-email/:token', authController.verifyEmail);
-router.post('/forgotPassword', authController.forgotPassword);
-router.patch('/resetPassword/:token', authController.resetPassword);
+// Load environment variables from config.env
+dotenv.config({ path: './config.env' });
 
-// --- GATEKEEPER ---
-router.use(authController.protect);
+// --- THIS IS THE KEY IMPORT ---
+// This file correctly imports `app.js` using a relative path.
+// It does NOT import any controllers.
+import app from './app.js';
 
-router.patch('/updateMyPassword', authController.updatePassword);
-router.get('/me', userController.getMe, userController.getUser);
-router.patch(
-  '/updateMe',
-  userController.uploadUserAvatar, // Use the single Cloudinary middleware
-  userController.updateMe
-);
-router.delete('/deleteMe', userController.deleteMe);
+// Get the database connection string from the environment
+const DB = process.env.DATABASE;
 
-router.post(
-  '/complete-onboarding',
-  userController.uploadUserAvatar, // Use the single Cloudinary middleware
-  userController.completeOnboarding
-);
+// Check if the DATABASE variable exists
+if (!DB) {
+  console.error('FATAL ERROR: DATABASE environment variable not found!');
+  process.exit(1); // Stop the server if the connection string is missing
+}
 
-router.post('/follow/:id', userController.follow);
-router.post('/unfollow/:id', userController.unfollow);
+// Connect to MongoDB and log the result for diagnostics
+mongoose
+  .connect(DB)
+  .then(conn => {
+    console.log(
+      `✅ DB connection successful to database: ${conn.connection.name}`
+    );
+  })
+  .catch(err => {
+    console.error('❌ DB Connection Error:', err.message);
+  });
 
-router.get('/me/followed-garages', userController.getFollowedGarages);
+// Start the Express server
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
+});
 
-// --- ADMIN-ONLY ROUTES ---
-router.use(authController.restrictTo('admin'));
-
-router.route('/').get(userController.getAllUsers);
-router
-  .route('/:id')
-  .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
-
-export default router;
+// Handle any unhandled promise rejections (like a bad DB password)
+process.on('unhandledRejection', err => {
+  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});
