@@ -1,4 +1,4 @@
-// server/app.js (FINAL, with Manual Header Override)
+// server/app.js
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
@@ -9,7 +9,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
-//import cors from 'cors';
+import cors from 'cors';
 
 import AppError from './utils/AppError.js';
 import globalErrorHandler from './controllers/errorController.js';
@@ -27,24 +27,27 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// 1. GLOBAL MIDDLEWARE
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
+
+// --- HELMET CSP CONFIGURATION FOR CLOUDINARY ---
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        'img-src': ["'self'", 'data:', 'res.cloudinary.com'],
+        'script-src': ["'self'", 'api.mapbox.com'],
+        'worker-src': ["'self'", 'blob:'],
+        'img-src': ["'self'", 'data:', 'res.cloudinary.com', 'api.mapbox.com'],
       },
     },
-    // This is still needed to allow the frontend to display the images
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
-
-// We still use helmet for general security, but we will override its resource policy.
-app.use(helmet());
-
-// --- END OF FIX ---
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -64,10 +67,8 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 
-// 2. SERVE STATIC FILES
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 3. API ROUTES
 app.use('/api/v1/garages', garageRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
@@ -77,7 +78,6 @@ app.use('/api/v1/search', searchRouter);
 app.use('/api/v1/events', eventRouter);
 app.use('/api/v1/tickets', ticketRouter);
 
-// 4. REACT APP SERVING & 404 HANDLER
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
   app.get('*', (req, res) => {
@@ -89,7 +89,6 @@ app.all('/api/*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// 5. GLOBAL ERROR HANDLING MIDDLEWARE
 app.use(globalErrorHandler);
 
 export default app;
