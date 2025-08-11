@@ -1,14 +1,14 @@
-// server/controllers/eventController.js
+// server/controllers/eventController.js (Final Version with Cloudinary)
 import Event from '../models/eventModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
-import sendEmail from '../utils/email.js'; // For sending notifications
+import sendEmail from '../utils/email.js';
 import APIFeatures from '../utils/apiFeatures.js';
 
 // FOR USERS: Submit an event for review
 export const submitEvent = catchAsync(async (req, res, next) => {
-  // All fields from the form
+  // All text fields from the form
   const {
     title,
     category,
@@ -29,13 +29,17 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     location,
     createdBy: req.user.id,
     submittedAt: Date.now(),
-    // Defaults from schema will set status to 'pending' and approved to 'false'
   };
 
-  // Handle the uploaded image if it exists
-  if (req.body.photos && req.body.photos.length > 0) {
-    eventData.image = req.body.photos[0];
+  // --- THIS IS THE FIX ---
+  // The Cloudinary upload middleware places uploaded file information into `req.files`.
+  // We check if a file was uploaded, and if so, we get its permanent URL
+  // from the `path` property and save it to the database.
+  if (req.files && req.files.length > 0) {
+    // We assume an event only has one main image, so we take the first one.
+    eventData.image = req.files[0].path;
   }
+  // --- END OF FIX ---
 
   const newEvent = await Event.create(eventData);
 
@@ -47,11 +51,11 @@ export const submitEvent = catchAsync(async (req, res, next) => {
   });
 });
 
-// THIS IS THE FIX: Only get approved, upcoming events
+// THIS FUNCTION IS UNCHANGED (Already Correct)
+// It only gets approved, upcoming events for the public list
 export const getAllPublicEvents = catchAsync(async (req, res, next) => {
   const today = new Date();
 
-  // We now correctly instantiate the APIFeatures class directly.
   const features = new APIFeatures(
     Event.find({
       approved: true,
@@ -75,10 +79,10 @@ export const getAllPublicEvents = catchAsync(async (req, res, next) => {
   });
 });
 
-// FOR PUBLIC: Get details of a single approved event
+// FOR PUBLIC: Get details of a single approved event (Unchanged)
 export const getPublicEvent = factory.getOne(Event);
 
-// --- ADMIN FUNCTIONS ---
+// --- ADMIN FUNCTIONS (All Unchanged) ---
 
 // Get all events regardless of status for the admin panel
 export const getAllEvents = factory.getAll(Event);
@@ -121,7 +125,7 @@ export const approveEvent = catchAsync(async (req, res, next) => {
     await sendEmail({
       email: event.createdBy.email,
       subject: `Your Event Submission: "${event.title}" has been Approved!`,
-      message: `Great news! Your event, "${event.title}", has been approved and is now live on MyGarage.`,
+      html: `<p>Great news! Your event, "${event.title}", has been approved and is now live on MyGarage.</p>`,
     });
   } catch (err) {
     console.error('Failed to send approval email:', err);
@@ -143,15 +147,15 @@ export const rejectEvent = catchAsync(async (req, res, next) => {
     return next(new AppError('No event found with that ID', 404));
   }
 
-  // Optional: Notify user of approval
+  // Optional: Notify user of rejection
   try {
     await sendEmail({
       email: event.createdBy.email,
-      subject: `Your Event Submission: "${event.title}" has been Approved!`,
-      message: `Great news! Your event, "${event.title}", has been approved and is now live on MyGarage.`,
+      subject: `Update on your event submission: "${event.title}"`,
+      html: `<p>Regarding your event submission for "${event.title}", we were unable to approve it at this time.</p>${reason ? `<p>Reason: ${reason}</p>` : ''}`,
     });
   } catch (err) {
-    console.error('Failed to send approval email:', err);
+    console.error('Failed to send rejection email:', err);
   }
 
   res.status(200).json({ status: 'success', message: 'Event rejected.' });
