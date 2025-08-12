@@ -217,9 +217,15 @@ export default function GarageProfilePage() {
               >
                 <div className="bg-white rounded-lg shadow-md overflow-hidden transform group-hover:scale-105 transition-transform duration-300">
                   <img
-                    src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-                      vehicle.coverPhoto || 'default-vehicle.png'
-                    }`}
+                    src={
+                      vehicle.coverPhoto?.startsWith('http')
+                        ? vehicle.coverPhoto
+                        : `${
+                            import.meta.env.VITE_STATIC_FILES_URL
+                          }/img/photos/${
+                            vehicle.coverPhoto || 'default-vehicle.png'
+                          }`
+                    }
                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                     className="w-full h-56 object-cover"
                   />
