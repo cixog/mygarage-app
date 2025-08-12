@@ -135,10 +135,57 @@ export const setVehicleCoverPhoto = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: { doc: vehicle } });
 });
 
-// --- UNCHANGED CONTROLLERS ---
 export const toggleLike = catchAsync(async (req, res, next) => {
-  /* ... */
+  const vehicleId = req.params.id;
+  const userId = req.user.id;
+
+  const vehicle = await Vehicle.findById(vehicleId);
+
+  if (!vehicle) {
+    return next(new AppError('No vehicle found with that ID', 404));
+  }
+
+  const isLiked = vehicle.likes.includes(userId);
+
+  const updateQuery = isLiked
+    ? { $pull: { likes: userId } }
+    : { $addToSet: { likes: userId } };
+
+  const updatedVehicle = await Vehicle.findByIdAndUpdate(
+    vehicleId,
+    updateQuery,
+    { new: true }
+  );
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      doc: updatedVehicle,
+    },
+  });
 });
+
 export const getLatestVehicles = catchAsync(async (req, res, next) => {
-  /* ... */
+  const limit = req.query.limit * 1 || 8;
+
+  const vehicles = await Vehicle.find()
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    // We need to populate the vehicle's 'garage', and within that, the garage's 'user'.
+    .populate({
+      path: 'garage',
+      select: 'user', // We only need the 'user' field from the garage document
+      populate: {
+        path: 'user',
+        select: 'name', // And we only need the 'name' from the user document
+      },
+    });
+
+  res.status(200).json({
+    status: 'success',
+    results: vehicles.length,
+    data: {
+      data: vehicles,
+    },
+  });
 });
