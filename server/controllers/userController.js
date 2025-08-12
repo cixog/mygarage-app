@@ -5,6 +5,7 @@ import Garage from '../models/garageModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
+import geocode from '../utils/geocoder.js';
 
 // --- 1. IMPORT the Cloudinary storage engine we created ---
 import { storage } from '../utils/cloudinary.js';
@@ -68,29 +69,39 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     return next(new AppError('You have already completed onboarding.', 400));
   }
 
-  const userUpdates = {
-    bio: req.body.about,
-    location: req.body.location,
-  };
+  const { about, location, garageName } = req.body;
 
-  // --- 6. THE FIX: Get the avatar URL from Cloudinary ---
-  // Same as updateMe, we get the permanent URL from `req.file.path`.
+  // 1. Prepare user updates
+  const userUpdates = {
+    bio: about,
+    location: location,
+  };
   if (req.file) {
     userUpdates.avatar = req.file.path;
   }
 
+  // 2. Geocode the location string to get coordinates
+  const [longitude, latitude] = await geocode(location);
+
+  // 3. Prepare garage data with the CORRECT GeoJSON structure
   const garageData = {
-    name: req.body.garageName,
-    description: req.body.about,
-    location: req.body.location,
+    name: garageName,
+    description: about,
     user: req.user.id,
+    location: {
+      type: 'Point',
+      coordinates: [longitude, latitude],
+      address: location,
+    },
   };
 
+  // 4. Create the garage and update the user in a sequence
   const newGarage = await Garage.create(garageData);
   userUpdates.garage = newGarage._id;
 
   await User.findByIdAndUpdate(req.user.id, userUpdates);
 
+  // 5. Fetch the fully populated user to send back to the frontend
   const finalUser = await User.findById(req.user.id).populate('garage');
 
   res.status(201).json({
