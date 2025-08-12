@@ -1,4 +1,4 @@
-// client/src/components/PhotoModal.jsx (Final version with correct event handling)
+// client/src/components/PhotoModal.jsx
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -62,9 +62,14 @@ export default function PhotoModal({
   }
 
   const currentPhoto = photos[internalIndex];
-  const photoUrl = `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-    currentPhoto.photo
-  }`;
+
+  // ✅ THIS IS THE FIX ✅
+  // We apply the same conditional logic to the modal's photo URL.
+  const photoUrl = currentPhoto.photo?.startsWith('http')
+    ? currentPhoto.photo
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
+        currentPhoto.photo
+      }`;
 
   const pageUrl = `${window.location.origin}/vehicles/${vehicleId}`;
   const encodedUrl = encodeURIComponent(pageUrl);
@@ -77,16 +82,12 @@ export default function PhotoModal({
   };
 
   return (
-    // The main overlay. Clicking this background closes the modal.
+    // The rest of the JSX in this file is correct and does not need to change.
     <div
       ref={modalContentRef}
       className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
       onClick={onClose}
     >
-      {/* 
-        This wrapper for the image prevents clicks on the image itself
-        from closing the modal.
-      */}
       <div
         className="relative w-full h-full flex items-center justify-center"
         onClick={e => e.stopPropagation()}
@@ -99,19 +100,10 @@ export default function PhotoModal({
           }`}
         />
       </div>
-
-      {/* Top-Left: Photo Counter */}
       <div className="absolute top-4 left-4 text-white text-lg bg-black bg-opacity-50 px-3 py-1 rounded-lg font-mono">
         {internalIndex + 1} / {photos.length}
       </div>
-
-      {/* Top-Right: Action Controls */}
       <div className="absolute top-4 right-4 flex items-center gap-3">
-        {/*
-          --- THE FIX ---
-          Each button's onClick now has an inline function that
-          first calls e.stopPropagation() and then performs its action.
-        */}
         <button
           onClick={e => {
             e.stopPropagation();
@@ -122,7 +114,6 @@ export default function PhotoModal({
         >
           <MagnifyingGlassPlusIcon className="w-6 h-6" />
         </button>
-
         <button
           onClick={e => {
             e.stopPropagation();
@@ -133,7 +124,6 @@ export default function PhotoModal({
         >
           <ArrowsPointingOutIcon className="w-6 h-6" />
         </button>
-
         <div className="relative">
           <button
             onClick={e => {
@@ -146,7 +136,6 @@ export default function PhotoModal({
             <ShareIcon className="w-6 h-6" />
           </button>
           {showShareMenu && (
-            // Clicks on the share menu itself are also stopped.
             <div
               onClick={e => e.stopPropagation()}
               className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 text-black"
@@ -176,7 +165,6 @@ export default function PhotoModal({
             </div>
           )}
         </div>
-
         <button
           onClick={e => {
             e.stopPropagation();
@@ -188,8 +176,6 @@ export default function PhotoModal({
           <XMarkIcon className="w-6 h-6" />
         </button>
       </div>
-
-      {/* NAVIGATION ARROWS with the fix */}
       {internalIndex > 0 && (
         <button
           onClick={e => {
@@ -202,7 +188,6 @@ export default function PhotoModal({
           <ChevronLeftIcon className="w-8 h-8" />
         </button>
       )}
-
       {internalIndex < photos.length - 1 && (
         <button
           onClick={e => {
