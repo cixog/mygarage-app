@@ -1,5 +1,3 @@
-// client/src/pages/GarageProfilePage.jsx (Complete with Welcome Prompt)
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api/api';
@@ -11,19 +9,13 @@ import AddVehicleForm from '../components/AddVehicleForm';
 import AddReviewForm from '../components/AddReviewForm';
 import ReviewList from '../components/ReviewList';
 import EditGarageForm from '../components/EditGarageForm';
-import WelcomePrompt from '../components/WelcomePrompt'; // <-- Import the new component
+import WelcomePrompt from '../components/WelcomePrompt';
 
 export default function GarageProfilePage() {
   const { garageId } = useParams();
   const { user: loggedInUser, setUser } = useAuth();
-
-  // Get location state from React Router to check for our 'isNewUser' flag
   const location = useLocation();
   const isNewUser = location.state?.isNewUser;
-
-  const avatarUrl = garageData.user.avatar?.startsWith('http')
-    ? garageData.user.avatar
-    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
 
   // Page Data State
   const [garageData, setGarageData] = useState(null);
@@ -135,6 +127,13 @@ export default function GarageProfilePage() {
       <p className="text-center text-red-500 p-10">Garage data is missing.</p>
     );
 
+  // ✅ THIS IS THE FIX: avatarUrl is now calculated *after* the guards.
+  const avatarUrl = garageData.user.avatar?.startsWith('http')
+    ? garageData.user.avatar
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
+        garageData.user.avatar || 'default.jpg'
+      }`;
+
   const isOwner = loggedInUser && loggedInUser._id === garageData.user._id;
   const followerCount = garageData?.user?.followers?.length || 0;
 
@@ -189,6 +188,8 @@ export default function GarageProfilePage() {
         </div>
       </div>
 
+      {/* Vehicle Collection Section and other JSX... */}
+      {/* ... the rest of the file remains the same */}
       {/* Vehicle Collection Section */}
       <div className="mt-8">
         <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-gray-200">
