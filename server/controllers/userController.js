@@ -71,7 +71,23 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
 
   const { about, location, garageName } = req.body;
 
-  // 1. Prepare user updates
+  // --- Geocode the location with proper error handling ---
+  let coordinates;
+  try {
+    // This is the call that was failing due to the missing environment variable
+    const [longitude, latitude] = await geocode(location);
+    coordinates = [longitude, latitude];
+  } catch (err) {
+    // If geocoding fails (bad location or API key issue), send a clean error.
+    return next(
+      new AppError(
+        'Could not find the location provided. Please try a different address.',
+        400
+      )
+    );
+  }
+
+  // Prepare user updates
   const userUpdates = {
     bio: about,
     location: location,
@@ -80,28 +96,25 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     userUpdates.avatar = req.file.path;
   }
 
-  // 2. Geocode the location string to get coordinates
-  const [longitude, latitude] = await geocode(location);
-
-  // 3. Prepare garage data with the CORRECT GeoJSON structure
+  // Prepare garage data with the CORRECT GeoJSON structure
   const garageData = {
     name: garageName,
     description: about,
     user: req.user.id,
     location: {
       type: 'Point',
-      coordinates: [longitude, latitude],
+      coordinates: coordinates, // Use the geocoded coordinates
       address: location,
     },
   };
 
-  // 4. Create the garage and update the user in a sequence
+  // Create the garage and update the user in a sequence
   const newGarage = await Garage.create(garageData);
   userUpdates.garage = newGarage._id;
 
   await User.findByIdAndUpdate(req.user.id, userUpdates);
 
-  // 5. Fetch the fully populated user to send back to the frontend
+  // Fetch the fully populated user to send back to the frontend
   const finalUser = await User.findById(req.user.id).populate('garage');
 
   res.status(201).json({
