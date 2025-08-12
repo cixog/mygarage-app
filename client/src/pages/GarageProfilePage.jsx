@@ -21,6 +21,10 @@ export default function GarageProfilePage() {
   const location = useLocation();
   const isNewUser = location.state?.isNewUser;
 
+  const avatarUrl = garageData.user.avatar?.startsWith('http')
+    ? garageData.user.avatar
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
+
   // Page Data State
   const [garageData, setGarageData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -139,9 +143,7 @@ export default function GarageProfilePage() {
       {/* Garage Header */}
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 p-6 bg-white rounded-lg shadow-md">
         <img
-          src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
-            garageData.user.avatar || 'default.jpg'
-          }`}
+          src={avatarUrl} // Use the corrected variable
           alt={`${garageData.user.name}'s avatar`}
           className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
         />

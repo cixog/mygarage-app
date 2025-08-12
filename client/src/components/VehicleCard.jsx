@@ -2,14 +2,9 @@
 import { Link } from 'react-router-dom';
 
 export default function VehicleCard({ vehicle }) {
-  const coverPhotoUrl =
-    vehicle.coverPhoto && vehicle.coverPhoto !== 'default-vehicle.png'
-      ? `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-          vehicle.coverPhoto
-        }`
-      : `${
-          import.meta.env.VITE_STATIC_FILES_URL
-        }/img/vehicles/default-vehicle.png`;
+  const coverPhotoUrl = vehicle.coverPhoto?.startsWith('http')
+    ? vehicle.coverPhoto
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
 
   // Defensive check for nested properties
   const ownerName = vehicle.garage?.user?.name || 'an owner';

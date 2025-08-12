@@ -1,5 +1,4 @@
-// client/src/pages/VehiclePage.jsx (Corrected with Render Guard)
-
+// client/pages/VehiclePage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/api';
@@ -35,17 +34,14 @@ export default function VehiclePage() {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   const fetchPageData = async () => {
-    // Reset state before fetching
     setLoading(true);
     setError(null);
     setVehicle(null);
-
     try {
       const [vehicleRes, commentsRes] = await Promise.all([
         api.get(`/vehicles/${vehicleId}`),
         api.get(`/vehicles/${vehicleId}/comments`),
       ]);
-
       setVehicle(vehicleRes.data.data.doc);
       setComments(commentsRes.data.data.data);
     } catch (err) {
@@ -73,12 +69,12 @@ export default function VehiclePage() {
 
   const handleUploadSuccess = () => {
     setIsUploadModalOpen(false);
-    fetchPageData(); // Refetch all data to get new photos
+    fetchPageData();
   };
 
   const handleUpdateSuccess = () => {
     setIsEditModalOpen(false);
-    fetchPageData(); // Refetch to show updated details
+    fetchPageData();
   };
 
   const handleDeleteVehicle = async () => {
@@ -88,11 +84,10 @@ export default function VehiclePage() {
       )
     )
       return;
-
     try {
       await api.delete(`/vehicles/${vehicleId}`);
       toast.success('Vehicle deleted successfully.');
-      navigate(`/profile`); // Redirect after deletion
+      navigate(`/profile`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete vehicle.');
     }
@@ -110,7 +105,7 @@ export default function VehiclePage() {
       await api.patch(`/vehicles/${vehicleId}/like`);
     } catch (err) {
       toast.error('Failed to update like status.');
-      setIsLiked(originalIsLiked); // Revert UI on failure
+      setIsLiked(originalIsLiked);
       setLikeCount(prev => (originalIsLiked ? prev + 1 : prev - 1));
     }
   };
@@ -133,15 +128,16 @@ export default function VehiclePage() {
     }
   };
 
-  const handleSetCoverPhoto = async photoFilename => {
-    if (vehicle.coverPhoto === photoFilename) return;
+  const handleSetCoverPhoto = async photoUrl => {
+    if (vehicle.coverPhoto === photoUrl) return;
     const originalCover = vehicle.coverPhoto;
-    setVehicle(prev => ({ ...prev, coverPhoto: photoFilename }));
+    setVehicle(prev => ({ ...prev, coverPhoto: photoUrl }));
     try {
-      await api.patch(`/vehicles/${vehicleId}/set-cover`, { photoFilename });
+      await api.patch(`/vehicles/${vehicleId}/set-cover`, {
+        photoFilename: photoUrl,
+      });
       toast.success('Cover photo updated!');
-      // 👇 --- ADD THIS LINE --- 👇
-      fetchPageData(); // This re-syncs the entire page with the database
+      fetchPageData();
     } catch (err) {
       setVehicle(prev => ({ ...prev, coverPhoto: originalCover }));
       toast.error('Failed to update cover photo.');
@@ -153,33 +149,28 @@ export default function VehiclePage() {
     try {
       await api.delete(`/photos/${photoId}`);
       toast.success('Photo deleted successfully!');
-      fetchPageData(); // The simplest way to refresh state correctly
+      fetchPageData();
     } catch (err) {
       toast.error('Failed to delete photo.');
     }
   };
 
-  // --- RENDER GUARDS ---
   if (loading)
     return <p className="text-center p-10 font-semibold">Loading Vehicle...</p>;
   if (error) return <p className="text-center text-red-500 p-10">{error}</p>;
-  // This is a key guard. If, after loading, the vehicle is still null, we can't render the page.
   if (!vehicle)
     return <p className="text-center p-10">No vehicle data found.</p>;
 
-  // --- DERIVED STATE (safe to calculate now) ---
   const isOwner = loggedInUser && loggedInUser._id === vehicle.user;
-  const coverPhotoUrl = vehicle.coverPhoto
-    ? `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-        vehicle.coverPhoto
-      }`
+
+  const coverPhotoUrl = vehicle.coverPhoto?.startsWith('http')
+    ? vehicle.coverPhoto
     : `${
         import.meta.env.VITE_STATIC_FILES_URL
       }/img/vehicles/default-vehicle.png`;
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-8">
-      {/* Header, Title, Details, etc. */}
       <div className="w-full aspect-video bg-gray-900 rounded-lg shadow-lg overflow-hidden">
         <img
           src={coverPhotoUrl}
@@ -300,23 +291,28 @@ export default function VehiclePage() {
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
             {vehicle.photos.map((photo, i) => {
               const isCurrentCover = vehicle.coverPhoto === photo.photo;
+
+              const photoUrl = photo.photo?.startsWith('http')
+                ? photo.photo
+                : `${
+                    import.meta.env.VITE_STATIC_FILES_URL
+                  }/img/vehicles/default-vehicle.png`;
+
               return (
                 <div
                   key={photo._id}
                   className="aspect-square group relative cursor-pointer"
-                  onClick={() => setSelectedPhotoIndex(i)} // Universal click handler
+                  onClick={() => setSelectedPhotoIndex(i)}
                 >
                   <img
-                    src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-                      photo.photo
-                    }`}
+                    src={photoUrl}
                     alt={photo.caption || `Photo of ${vehicle.model}`}
                     className="w-full h-full object-cover rounded-lg shadow-md group-hover:opacity-75 transition-opacity"
                   />
                   {isOwner && (
                     <div
                       className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
-                      onClick={e => e.stopPropagation()} // Prevent modal from opening when clicking owner controls
+                      onClick={e => e.stopPropagation()}
                     >
                       {isCurrentCover ? (
                         <span className="text-white font-bold text-xs bg-green-600 px-2 py-1 rounded">
@@ -390,7 +386,7 @@ export default function VehiclePage() {
         </div>
       </div>
 
-      {/* --- MODALS --- */}
+      {/* Modals */}
       {isOwner && isUploadModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -408,7 +404,6 @@ export default function VehiclePage() {
           </div>
         </div>
       )}
-
       {isOwner && isEditModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -425,14 +420,6 @@ export default function VehiclePage() {
           </div>
         </div>
       )}
-
-      {/* 
-        --- THE DEFINITIVE FIX ---
-        We now add a compound condition. The modal will only render if:
-        1. A photo index has been selected (selectedPhotoIndex is not null).
-        2. The vehicle data has loaded (`vehicle` is not null).
-        3. The vehicle data actually contains a `photos` array.
-      */}
       {selectedPhotoIndex !== null && vehicle && vehicle.photos && (
         <PhotoModal
           photos={vehicle.photos}

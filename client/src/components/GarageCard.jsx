@@ -5,13 +5,11 @@ import carIcon from '../assets/car-front.svg'; // Ensure this path is correct
 
 export default function GarageCard({ garage }) {
   const coverPhotoUrl =
-    garage.coverPhoto && garage.coverPhoto !== 'default-garage-cover.jpg'
-      ? `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
+    garage.coverPhoto && garage.coverPhoto.startsWith('http')
+      ? garage.coverPhoto
+      : `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
           garage.coverPhoto
-        }`
-      : `${
-          import.meta.env.VITE_STATIC_FILES_URL
-        }/img/garages/default-garage-cover.jpg`;
+        }`;
 
   return (
     <Link

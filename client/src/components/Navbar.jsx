@@ -31,9 +31,9 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const userAvatar = user
-    ? `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${user.avatar}`
-    : 'default.jpg';
+  const userAvatar = user?.avatar?.startsWith('http')
+    ? user.avatar
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
 
   return (
     <>
@@ -74,7 +74,7 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                   <img
-                    src={userAvatar}
+                    src={userAvatar} // Use the corrected variable
                     alt={user.name}
                     className="w-10 h-10 rounded-full object-cover border-2 border-gray-500 hover:border-blue-400"
                   />
