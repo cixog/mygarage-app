@@ -15,8 +15,9 @@ export default function Onboarding() {
   const [formData, setFormData] = useState({
     garageName: '',
     location: '',
-    about: '',
+    address: '', // <-- NEW: for the street address
   });
+  const [isPublicAddress, setIsPublicAddress] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,9 +39,13 @@ export default function Onboarding() {
     const submissionData = new FormData();
     submissionData.append('garageName', formData.garageName);
     submissionData.append('location', formData.location);
-    submissionData.append('about', formData.about);
+    submissionData.append('isPublicAddress', isPublicAddress);
     if (avatarFile) {
       submissionData.append('avatar', avatarFile);
+    }
+
+    if (isPublicAddress) {
+      submissionData.append('address', formData.address);
     }
 
     try {
@@ -91,12 +96,35 @@ export default function Onboarding() {
         <input
           type="text"
           name="location"
-          placeholder="Location (e.g., San Francisco, CA)"
+          placeholder="City, State, or Zip Code" // <-- Updated placeholder
           value={formData.location}
           onChange={handleChange}
           required
-          className="w-full border rounded px-3 py-2"
         />
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isPublicAddress"
+            checked={isPublicAddress}
+            onChange={e => setIsPublicAddress(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <label htmlFor="isPublicAddress" className="text-sm text-gray-700">
+            This is a public business address
+          </label>
+        </div>
+
+        {/* --- The Conditional Address Field --- */}
+        {isPublicAddress && (
+          <input
+            type="text"
+            name="address"
+            placeholder="Street Address (e.g., 123 Main St)"
+            value={formData.address}
+            onChange={handleChange}
+            required // Only required if the checkbox is ticked
+          />
+        )}
         <textarea
           name="about"
           placeholder="Tell the story behind your collection..."

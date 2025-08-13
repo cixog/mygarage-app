@@ -69,16 +69,21 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     return next(new AppError('You have already completed onboarding.', 400));
   }
 
-  const { about, location, garageName } = req.body;
+  // 1. Correctly destructure all needed fields from the request body.
+  const { garageName, location, address, isPublicAddress, about } = req.body;
 
-  // --- Geocode the location with proper error handling ---
+  // 2. Use the combined location string for geocoding to get the best coordinates.
+  const locationToGeocode =
+    isPublicAddress === 'true' && address
+      ? `${address}, ${location}`
+      : location;
+
   let coordinates;
   try {
-    // This is the call that was failing due to the missing environment variable
-    const [longitude, latitude] = await geocode(location);
+    // 3. Pass the correct variable to the geocode function.
+    const [longitude, latitude] = await geocode(locationToGeocode);
     coordinates = [longitude, latitude];
   } catch (err) {
-    // If geocoding fails (bad location or API key issue), send a clean error.
     return next(
       new AppError(
         'Could not find the location provided. Please try a different address.',
@@ -87,34 +92,37 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Prepare user updates
+  // Prepare user updates (this part is correct)
   const userUpdates = {
     bio: about,
-    location: location,
+    location: location, // The user's profile location is always the general one
   };
   if (req.file) {
     userUpdates.avatar = req.file.path;
   }
 
-  // Prepare garage data with the CORRECT GeoJSON structure
+  // 4. Build the garage's specific location object.
+  const garageLocationObject = {
+    type: 'Point',
+    coordinates: coordinates,
+    address: locationToGeocode, // The garage's address is the most specific one we have
+  };
+
+  // Prepare the full garage data object
   const garageData = {
     name: garageName,
     description: about,
     user: req.user.id,
-    location: {
-      type: 'Point',
-      coordinates: coordinates, // Use the geocoded coordinates
-      address: location,
-    },
+    // 5. Assign the correctly prepared location object.
+    location: garageLocationObject,
   };
 
-  // Create the garage and update the user in a sequence
+  // Create the garage and update the user in sequence (this part is correct)
   const newGarage = await Garage.create(garageData);
   userUpdates.garage = newGarage._id;
 
   await User.findByIdAndUpdate(req.user.id, userUpdates);
 
-  // Fetch the fully populated user to send back to the frontend
   const finalUser = await User.findById(req.user.id).populate('garage');
 
   res.status(201).json({
