@@ -59,7 +59,7 @@ export const getGarage = catchAsync(async (req, res, next) => {
   const garage = await Garage.findById(req.params.id)
     .populate({
       path: 'user',
-      select: 'name avatar location createdAt followers',
+      select: 'name avatar location followers createdAt',
     })
     .populate({
       path: 'vehicles',
