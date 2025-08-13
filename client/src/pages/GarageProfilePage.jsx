@@ -135,7 +135,7 @@ export default function GarageProfilePage() {
   // --- THIS IS THE FIX (Part 1) ---
   // We create a new formatted date string before rendering.
   // The user.createdAt field comes from the `getGarage` controller's population.
-  const joinDate = new Date(garageData.users.createdAt).toLocaleDateString(
+  const joinDate = new Date(garageData.user.createdAt).toLocaleDateString(
     'en-US',
     {
       year: 'numeric',
