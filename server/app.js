@@ -1,4 +1,4 @@
-// server/app.js
+// server/app.js (Corrected with trust proxy)
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
@@ -26,6 +26,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// ✅ --- THIS IS THE FIX --- ✅
+// Tell Express to trust the headers added by Render's reverse proxy.
+// This is crucial for rate limiting and getting the user's real IP.
+app.set('trust proxy', 1);
 
 app.use(
   cors({
