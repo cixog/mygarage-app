@@ -1,3 +1,5 @@
+// client/src/pages/GarageProfilePage.jsx
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api/api';
@@ -29,13 +31,9 @@ export default function GarageProfilePage() {
   const [reviewListKey, setReviewListKey] = useState(Date.now());
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // State to control the visibility of our new Welcome Prompt
   const [showWelcomePrompt, setShowWelcomePrompt] = useState(isNewUser);
-
-  // A ref that we will attach to our target button
   const addVehicleButtonRef = useRef(null);
 
-  // --- Data Fetching ---
   const fetchGarage = async () => {
     if (!garageId) return;
     setLoading(true);
@@ -70,7 +68,6 @@ export default function GarageProfilePage() {
     setIsFollowing(currentlyFollowing);
   }, [loggedInUser, garageData]);
 
-  // --- Event Handlers ---
   const handleFollowToggle = async () => {
     if (!loggedInUser || !garageData?.user) return;
 
@@ -119,7 +116,6 @@ export default function GarageProfilePage() {
     setReviewListKey(Date.now());
   };
 
-  // --- Render Guards ---
   if (loading) return <p className="text-center p-10">Loading Garage...</p>;
   if (error) return <p className="text-center text-red-500 p-10">{error}</p>;
   if (!garageData || !garageData.user)
@@ -127,7 +123,6 @@ export default function GarageProfilePage() {
       <p className="text-center text-red-500 p-10">Garage data is missing.</p>
     );
 
-  // ✅ THIS IS THE FIX: avatarUrl is now calculated *after* the guards.
   const avatarUrl = garageData.user.avatar?.startsWith('http')
     ? garageData.user.avatar
     : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
@@ -137,12 +132,22 @@ export default function GarageProfilePage() {
   const isOwner = loggedInUser && loggedInUser._id === garageData.user._id;
   const followerCount = garageData?.user?.followers?.length || 0;
 
+  // --- THIS IS THE FIX (Part 1) ---
+  // We create a new formatted date string before rendering.
+  // The user.createdAt field comes from the `getGarage` controller's population.
+  const joinDate = new Date(garageData.user.createdAt).toLocaleDateString(
+    'en-US',
+    {
+      year: 'numeric',
+      month: 'short',
+    }
+  );
+
   return (
     <div className="max-w-6xl mx-auto p-4">
-      {/* Garage Header */}
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 p-6 bg-white rounded-lg shadow-md">
         <img
-          src={avatarUrl} // Use the corrected variable
+          src={avatarUrl}
           alt={`${garageData.user.name}'s avatar`}
           className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
         />
@@ -154,11 +159,15 @@ export default function GarageProfilePage() {
             Owned by{' '}
             <span className="font-semibold">{garageData.user.name}</span>
           </p>
-          <div className="flex justify-center md:justify-start items-center gap-4 mt-1 text-gray-500">
+
+          {/* We add the new `joinDate` variable to this metadata section. */}
+          <div className="flex justify-center md:justify-start items-center gap-x-3 text-sm text-gray-500 mt-2">
             <span>
               Followed by <span className="font-bold">{followerCount}</span>{' '}
               {followerCount === 1 ? 'user' : 'users'}
             </span>
+            <span className="hidden sm:inline">•</span>
+            <span>Joined {joinDate}</span>
           </div>
           <p className="text-gray-700 mt-2 max-w-xl">
             {garageData.description || 'No description provided.'}
@@ -188,8 +197,7 @@ export default function GarageProfilePage() {
         </div>
       </div>
 
-      {/* Vehicle Collection Section and other JSX... */}
-      {/* ... the rest of the file remains the same */}
+      {/* The rest of the file remains the same... */}
       {/* Vehicle Collection Section */}
       <div className="mt-8">
         <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-gray-200">
@@ -197,7 +205,6 @@ export default function GarageProfilePage() {
             Vehicle Collection ({garageData.vehicles?.length || 0})
           </h2>
           {isOwner && (
-            // Attach the ref to the '+ Add Vehicle' button
             <button
               ref={addVehicleButtonRef}
               onClick={() => setIsAddVehicleModalOpen(true)}
@@ -279,7 +286,7 @@ export default function GarageProfilePage() {
         <ReviewList key={reviewListKey} garageId={garageId} />
       </div>
 
-      {/* --- MODALS --- */}
+      {/* Modals and Welcome Prompt... */}
       {isOwner && isAddVehicleModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -312,8 +319,6 @@ export default function GarageProfilePage() {
         </div>
       )}
 
-      {/* --- Welcome Prompt --- */}
-      {/* Conditionally render the WelcomePrompt at the end of the component */}
       {showWelcomePrompt && isOwner && (
         <WelcomePrompt
           targetRef={addVehicleButtonRef}
