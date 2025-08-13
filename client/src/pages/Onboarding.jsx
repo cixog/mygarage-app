@@ -100,6 +100,7 @@ export default function Onboarding() {
           value={formData.location}
           onChange={handleChange}
           required
+          className="w-full border rounded px-3 py-2"
         />
         <div className="flex items-center gap-2">
           <input
@@ -123,6 +124,7 @@ export default function Onboarding() {
             value={formData.address}
             onChange={handleChange}
             required // Only required if the checkbox is ticked
+            className="w-full border rounded px-3 py-2"
           />
         )}
         <textarea
