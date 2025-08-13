@@ -73,7 +73,7 @@ garageSchema.virtual('vehicleCount').get(function () {
 garageSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
-    select: 'name avatar followers location',
+    select: 'name avatar followers location createdAt',
     // Only populate the 'user' field if the user has `active: true`
     match: { active: { $ne: false } },
   });
