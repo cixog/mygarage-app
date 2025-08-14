@@ -62,7 +62,10 @@ export const getGarage = catchAsync(async (req, res, next) => {
     })
     .populate({
       path: 'vehicles',
-      select: 'make model year coverPhoto _id',
+      select: 'make model year coverPhoto _id', // Keep this selection for efficiency
+      populate: {
+        path: 'commentCount', // And ALSO populate our new virtual field
+      },
     });
 
   if (!garage || !garage.user) {

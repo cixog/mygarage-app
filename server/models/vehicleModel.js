@@ -64,6 +64,15 @@ const vehicleSchema = new mongoose.Schema(
   }
 );
 
+// This tells Mongoose: "When I ask for 'commentCount', please count the documents
+// in the 'Comment' collection where the 'vehicle' field matches this vehicle's '_id'."
+vehicleSchema.virtual('commentCount', {
+  ref: 'Comment', // The model to use
+  localField: '_id', // Find in 'Comment' where...
+  foreignField: 'vehicle', // ... 'vehicle' field...
+  count: true, // ... and just count them.
+});
+
 // Create an index for faster querying of a user's vehicles
 vehicleSchema.index({ user: 1, garage: 1 });
 

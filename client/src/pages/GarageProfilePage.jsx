@@ -5,6 +5,7 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 
 // Component Imports
 import AddVehicleForm from '../components/AddVehicleForm';
@@ -240,6 +241,14 @@ export default function GarageProfilePage() {
                     <h3 className="text-xl font-semibold text-gray-900">
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </h3>
+                    {vehicle.commentCount > 0 && (
+                      <div className="flex items-center gap-1.5 mt-2 text-gray-500">
+                        <ChatBubbleOvalLeftEllipsisIcon className="h-5 w-5" />
+                        <span className="text-sm font-semibold">
+                          {vehicle.commentCount}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>
