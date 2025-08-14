@@ -35,40 +35,47 @@ export default function ReviewList({ garageId }) {
 
   return (
     <div className="space-y-6">
-      {reviews.map(review => (
-        <div
-          key={review._id}
-          className="flex items-start space-x-4 p-4 border-b"
-        >
-          <Link to={`/profile/${review.user._id}`}>
-            <img
-              src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
-                review.user.avatar || 'default.jpg'
-              }`}
-              alt={review.user.name}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          </Link>
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <Link
-                to={`/profile/${review.user._id}`}
-                className="font-bold hover:underline"
-              >
-                {review.user.name}
-              </Link>
-              <span className="text-yellow-500 font-bold">
-                {'★'.repeat(review.rating)}
-                {'☆'.repeat(5 - review.rating)}
-              </span>
+      {reviews.map(review => {
+        // ✅ THIS IS THE FIX: Conditionally build the avatar URL
+        const avatarUrl = review.user.avatar?.startsWith('http')
+          ? review.user.avatar // If it's a full URL from Cloudinary, use it directly
+          : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
+              review.user.avatar || 'default.jpg' // Otherwise, build the local path
+            }`;
+
+        return (
+          <div
+            key={review._id}
+            className="flex items-start space-x-4 p-4 border-b"
+          >
+            <Link to={`/profile/${review.user._id}`}>
+              <img
+                src={avatarUrl} // Use the correctly constructed URL
+                alt={review.user.name}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            </Link>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <Link
+                  to={`/profile/${review.user._id}`}
+                  className="font-bold hover:underline"
+                >
+                  {review.user.name}
+                </Link>
+                <span className="text-yellow-500 font-bold">
+                  {'★'.repeat(review.rating)}
+                  {'☆'.repeat(5 - review.rating)}
+                </span>
+              </div>
+              <p className="text-gray-500 text-sm mb-2">
+                {new Date(review.createdAt).toLocaleDateString()}
+              </p>
+              <p className="text-gray-800">{review.review}</p>
             </div>
-            <p className="text-gray-500 text-sm mb-2">
-              {new Date(review.createdAt).toLocaleDateString()}
-            </p>
-            <p className="text-gray-800">{review.review}</p>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
