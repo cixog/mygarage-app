@@ -4,7 +4,7 @@ import { useState } from 'react';
 import api from '../api/api';
 
 export default function AddReviewForm({ garageId, onReviewAdded }) {
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState('');
   const [review, setReview] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,7 +16,7 @@ export default function AddReviewForm({ garageId, onReviewAdded }) {
 
     try {
       await api.post(`/garages/${garageId}/reviews`, {
-        rating,
+        rating: Number(rating),
         review,
       });
       // Call the parent component's callback function
@@ -41,15 +41,16 @@ export default function AddReviewForm({ garageId, onReviewAdded }) {
           htmlFor="rating"
           className="block text-sm font-medium text-gray-700"
         >
-          Rating (1-5)
+          Rating
         </label>
         <input
           id="rating"
           type="number"
           min="1"
           max="5"
+          placeholder="1 - 5"
           value={rating}
-          onChange={e => setRating(Number(e.target.value))}
+          onChange={e => setRating(e.target.value)}
           required
           className="mt-1 w-full border rounded px-3 py-2"
         />
