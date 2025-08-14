@@ -233,9 +233,8 @@ export default function AdminDashboard() {
               {selectedEvent.image && (
                 <div className="w-full aspect-video bg-gray-200 rounded-lg overflow-hidden">
                   <img
-                    src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-                      selectedEvent.image
-                    }`}
+                    // ✅ THIS IS THE FIX: Use the 'image' property directly as it's a full URL.
+                    src={selectedEvent.image}
                     alt={`Submission for ${selectedEvent.title}`}
                     className="w-full h-full object-cover"
                   />

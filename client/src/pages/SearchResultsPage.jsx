@@ -77,27 +77,34 @@ export default function SearchResultsPage() {
                 Users
               </h2>
               <div className="space-y-4 max-w-lg">
-                {users.map(user => (
-                  <Link
-                    key={user._id}
-                    to={`/profile/${user._id}`}
-                    className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <img
-                      src={`${
-                        import.meta.env.VITE_STATIC_FILES_URL
-                      }/img/users/${user.avatar}`}
-                      alt={user.name}
-                      className="w-12 h-12 rounded-full mr-4 object-cover"
-                    />
-                    <div>
-                      <p className="font-bold text-gray-800">{user.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {user.location || 'Location not set'}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                {users.map(user => {
+                  // ✅ THIS IS THE FIX: Add the conditional logic for the avatar URL.
+                  const avatarUrl = user.avatar?.startsWith('http')
+                    ? user.avatar
+                    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
+                        user.avatar || 'default.jpg'
+                      }`;
+
+                  return (
+                    <Link
+                      key={user._id}
+                      to={`/profile/${user._id}`}
+                      className="flex items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <img
+                        src={avatarUrl} // Use the corrected variable
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full mr-4 object-cover"
+                      />
+                      <div>
+                        <p className="font-bold text-gray-800">{user.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {user.location || 'Location not set'}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}

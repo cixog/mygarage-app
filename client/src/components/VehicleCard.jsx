@@ -2,9 +2,12 @@
 import { Link } from 'react-router-dom';
 
 export default function VehicleCard({ vehicle }) {
+  // ✅ THIS IS THE FIX: This logic correctly handles all cases.
   const coverPhotoUrl = vehicle.coverPhoto?.startsWith('http')
-    ? vehicle.coverPhoto
-    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
+    ? vehicle.coverPhoto // Use full Cloudinary URL
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
+        vehicle.coverPhoto || 'default-vehicle.png' // Build path for local file or use default
+      }`;
 
   // Defensive check for nested properties
   const ownerName = vehicle.garage?.user?.name || 'an owner';
@@ -17,7 +20,7 @@ export default function VehicleCard({ vehicle }) {
       {/* Card Image */}
       <div className="h-48 bg-gray-200">
         <img
-          src={coverPhotoUrl}
+          src={coverPhotoUrl} // Use the corrected variable
           alt={`Cover for ${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           className="w-full h-full object-cover"
         />

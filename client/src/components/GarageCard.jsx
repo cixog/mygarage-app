@@ -3,23 +3,42 @@
 import { Link } from 'react-router-dom';
 import carIcon from '../assets/car-front.svg'; // Ensure this path is correct
 
+// A helper function to transform Cloudinary URLs
+const transformCloudinaryUrl = (url, width) => {
+  // If it's not a cloudinary URL, return it as is
+  if (!url || !url.includes('res.cloudinary.com')) {
+    return url;
+  }
+  // This is a simple example. You can add more complex transformations.
+  // f_auto = automatically choose the best format (like webp)
+  // q_auto = automatically set the best quality
+  // w_...  = set the width
+  const transformation = `f_auto,q_auto,w_${width}`;
+  return url.replace('/upload/', `/upload/${transformation}/`);
+};
+
 export default function GarageCard({ garage }) {
-  const coverPhotoUrl =
+  const originalCoverPhotoUrl =
     garage.coverPhoto && garage.coverPhoto.startsWith('http')
       ? garage.coverPhoto
       : `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
           garage.coverPhoto
         }`;
 
+  // ✅ OPTIMIZATION: Request a smaller, optimized version for the card
+  const optimizedCoverPhotoUrl = transformCloudinaryUrl(
+    originalCoverPhotoUrl,
+    400
+  ); // Request a 400px wide version
+
   return (
     <Link
       to={`/garages/${garage._id}`}
       className="block group bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300"
     >
-      {/* Card Image */}
       <div className="h-48 bg-gray-200">
         <img
-          src={coverPhotoUrl}
+          src={optimizedCoverPhotoUrl} // Use the optimized URL
           alt={`Cover for ${garage.name}`}
           className="w-full h-full object-cover"
         />

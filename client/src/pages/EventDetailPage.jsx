@@ -44,13 +44,10 @@ export default function EventDetailPage() {
       {event.image && (
         <div className="w-full aspect-video bg-gray-200 rounded-lg shadow-md overflow-hidden mb-6">
           <img
-            // The URL is constructed to point to your public static assets folder.
-            // The `resizeUserPhoto` middleware saves event images to `public/img/photos`.
-            src={`${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
-              event.image
-            }`}
+            // ✅ THIS IS THE FIX: Use the 'image' property directly.
+            src={event.image}
             alt={`Promotional image for ${event.title}`}
-            className="w-full h-full object-cover" // object-cover ensures the image fills the container without distortion.
+            className="w-full h-full object-cover"
           />
         </div>
       )}
