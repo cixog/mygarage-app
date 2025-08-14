@@ -179,7 +179,6 @@ export default function VehiclePage() {
         />
       </div>
 
-      {/* ... the rest of the file remains the same */}
       <div className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-800">
           {vehicle.year} {vehicle.make} {vehicle.model}
@@ -275,7 +274,6 @@ export default function VehiclePage() {
         </div>
       </div>
 
-      {/* Photo Gallery Section */}
       <div>
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h2 className="text-2xl font-semibold">Photo Gallery</h2>
@@ -346,7 +344,6 @@ export default function VehiclePage() {
         )}
       </div>
 
-      {/* Comments Section */}
       <div className="max-w-2xl mx-auto">
         <h3 className="text-lg font-semibold mb-4">
           {comments.length} Comments
@@ -370,24 +367,41 @@ export default function VehiclePage() {
             </button>
           </form>
         )}
+        {/* --- THIS IS THE CORRECTED SECTION --- */}
         <div className="space-y-6">
-          {comments.map(comment => (
-            <div key={comment._id} className="flex items-start space-x-4">
-              <div className="flex-1 bg-gray-100 rounded-lg p-4">
-                <div className="font-semibold">
-                  {comment.user?.name || 'User'}
+          {comments.map(comment => {
+            const avatarUrl =
+              comment.user && comment.user.avatar?.startsWith('http')
+                ? comment.user.avatar
+                : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
+                    comment.user?.avatar || 'default.jpg'
+                  }`;
+
+            return (
+              <div key={comment._id} className="flex items-start space-x-4">
+                <Link to={`/profile/${comment.user?._id}`}>
+                  <img
+                    src={avatarUrl}
+                    alt={comment.user?.name || 'User avatar'}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </Link>
+                <div className="flex-1 bg-gray-100 rounded-lg p-4">
+                  <div className="font-semibold">
+                    {comment.user?.name || 'User'}
+                  </div>
+                  <span className="text-xs text-gray-500 mb-1">
+                    {new Date(comment.createdAt).toLocaleString()}
+                  </span>
+                  <p className="text-gray-800">{comment.text}</p>
                 </div>
-                <span className="text-xs text-gray-500 mb-1">
-                  {new Date(comment.createdAt).toLocaleString()}
-                </span>
-                <p className="text-gray-800">{comment.text}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Modals */}
+      {/* --- Modals --- */}
       {isOwner && isUploadModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
