@@ -32,8 +32,10 @@ const Navbar = () => {
   }, []);
 
   const userAvatar = user?.avatar?.startsWith('http')
-    ? user.avatar
-    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/default.jpg`;
+    ? user.avatar // Use the full Cloudinary URL
+    : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
+        user?.avatar || 'default.jpg' // Build the path for a local file or use the default
+      }`;
 
   return (
     <>
