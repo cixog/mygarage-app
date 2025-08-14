@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import { ChevronLeftIcon } from '@heroicons/react/24/solid';
 
 import PhotoModal from '../components/PhotoModal';
 import PhotoUpload from '../components/PhotoUpload';
@@ -211,12 +212,10 @@ export default function VehiclePage() {
         {vehicle.garage && (
           <Link
             to={`/garages/${vehicle.garage._id}`}
-            className="text-lg text-gray-600 hover:text-blue-600 transition"
+            className="inline-flex items-center gap-2 text-lg font-semibold text-gray-600 hover:text-blue-700 transition group"
           >
-            from the garage of{' '}
-            <span className="font-semibold">
-              {vehicle.garage?.user?.name || 'an unknown owner'}
-            </span>
+            <ChevronLeftIcon className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            Back to {vehicle.garage.name}
           </Link>
         )}
       </div>
