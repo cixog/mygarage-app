@@ -1,5 +1,3 @@
-// Save as: client/src/components/EditGarageForm.jsx
-
 import { useState, useEffect } from 'react';
 import api from '../api/api';
 import toast from 'react-hot-toast';
@@ -8,7 +6,7 @@ export default function EditGarageForm({ garage, onUpdateSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    location: '',
+    location: '', // This will now hold just the address string
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,7 +16,9 @@ export default function EditGarageForm({ garage, onUpdateSuccess }) {
       setFormData({
         name: garage.name || '',
         description: garage.description || '',
-        location: garage.location || '',
+        // ✅ THIS IS THE FIX (Part 1): We now access the 'address' property of the location object.
+        // Optional chaining (?.) prevents an error if garage.location doesn't exist.
+        location: garage.location?.address || '',
       });
     }
   }, [garage]);
@@ -32,9 +32,12 @@ export default function EditGarageForm({ garage, onUpdateSuccess }) {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Use the new user-specific endpoint
+      // ✅ THIS IS THE FIX (Part 2): The API call now sends a clean payload,
+      // and the backend will be updated to handle it correctly.
       await api.patch('/garages/my-garage', formData);
       toast.success('Garage updated successfully!');
+
+      // This function call (which closes the modal) will now be reached.
       if (onUpdateSuccess) {
         onUpdateSuccess();
       }

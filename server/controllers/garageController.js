@@ -1,12 +1,11 @@
 // server/controllers/garageController.js (Corrected to filter for active users first)
 import Garage from '../models/garageModel.js';
 import User from '../models/userModel.js';
-// import Vehicle from '../models/vehicleModel.js';
-// import Photo from '../models/photoModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import geocode from '../utils/geocoder.js';
 
 export const getAllGarages = catchAsync(async (req, res, next) => {
   const activeUsers = await User.find({ active: { $ne: false } }).select('_id');
@@ -89,7 +88,47 @@ export const createMyGarage = catchAsync(async (req, res, next) => {
 });
 
 export const updateMyGarage = catchAsync(async (req, res, next) => {
-  // ... no changes here
+  // 2. Find the garage belonging to the currently logged-in user
+  const garage = await Garage.findOne({ user: req.user.id });
+
+  if (!garage) {
+    return next(new AppError('You do not have a garage to update.', 404));
+  }
+
+  // 3. Update the simple text fields directly
+  garage.name = req.body.name || garage.name;
+  garage.description = req.body.description || garage.description;
+
+  // 4. Handle the location update
+  const newAddress = req.body.location;
+  // Only geocode if a new address is provided AND it's different from the old one
+  if (newAddress && newAddress !== garage.location.address) {
+    try {
+      const [longitude, latitude] = await geocode(newAddress);
+      garage.location = {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+        address: newAddress,
+      };
+    } catch (err) {
+      return next(
+        new AppError(
+          'Could not find the location provided. Please try a different address.',
+          400
+        )
+      );
+    }
+  }
+
+  // 5. Save the updated document
+  const updatedGarage = await garage.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      garage: updatedGarage,
+    },
+  });
 });
 
 export const deleteMyGarage = catchAsync(async (req, res, next) => {
