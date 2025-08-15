@@ -10,22 +10,25 @@ const About = () => {
         <Link to="/" className="font-semibold text-blue-600 hover:underline">
           MyGarage
         </Link>{' '}
-        – the online hangout for gearheads, collectors, and anyone who loves
-        cars, bikes, or anything with an engine.
+        - is the online hangout for gearheads, collectors, and anyone who loves
+        cars, bikes, or anything moving down the road with an engine.
       </p>
 
       <p className="mb-4 text-lg leading-relaxed">
-        MyGarage is a fun, easygoing space where you can build your own{' '}
+        Think about all the incredible machines you only get to see if they’re
+        for sale or happen to pass by on the road. Here, owners can introduce
+        their rides to the world—even if you live halfway across the globe. I
+        built MyGarage as a fun, easygoing space where you can create your own{' '}
         <em>virtual garage</em>. Snap a few photos, upload your favorite rides,
-        and show off your collection to the world. Each user gets a personalized
-        page where they can post vehicle pics, add descriptions, and tell the
-        stories behind the machines.
+        and show off your collection—it’s all meant for fun. Each user gets a
+        personalized page where they can post vehicle pics, add descriptions,
+        and share the stories behind their machines.
       </p>
 
-      {/* ... other paragraphs also corrected ... */}
-
       <p className="mb-4 text-lg leading-relaxed">
-        Looking for something to do offline? Check out our{' '}
+        If you admire a garage or a particular ride, you can leave a message to
+        connect with the owner. Looking for something to do offline? Check out
+        our{' '}
         <Link
           to="/events"
           className="text-blue-600 font-semibold hover:underline"
