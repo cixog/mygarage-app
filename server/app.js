@@ -32,9 +32,19 @@ const app = express();
 // This is crucial for rate limiting and getting the user's real IP.
 app.set('trust proxy', 1);
 
+// --- THIS IS THE FIX ---
+// The `cors` configuration is updated to allow both www and non-www domains.
+// We check if the CLIENT_URL environment variable is set. If it is, we create
+// an array containing both versions.
+const allowedOrigins = [];
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL); // e.g., https://www.tourmygarage.com
+  allowedOrigins.push(process.env.CLIENT_URL.replace('www.', '')); // e.g., https://tourmygarage.com
+}
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: allowedOrigins,
     credentials: true,
   })
 );
