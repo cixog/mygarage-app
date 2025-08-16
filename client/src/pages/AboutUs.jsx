@@ -8,7 +8,7 @@ const About = () => {
       <p className="mb-4 text-lg leading-relaxed">
         Welcome to{' '}
         <Link to="/" className="font-semibold text-blue-600 hover:underline">
-          MyGarage
+          MyTinHouse
         </Link>{' '}
         - is the online hangout for gearheads, collectors, and anyone who loves
         cars, bikes, or anything moving down the road with an engine.
@@ -18,7 +18,7 @@ const About = () => {
         Think about all the incredible machines you only get to see if they’re
         for sale or happen to pass by on the road. Here, owners can introduce
         their rides to the world—even if you live halfway across the globe. I
-        built MyGarage as a fun, easygoing space where you can create your own{' '}
+        built MyTinHouse as a fun, easygoing space where you can create your own{' '}
         <em>virtual garage</em>. Snap a few photos, upload your favorite rides,
         and show off your collection—it’s all meant for fun. Each user gets a
         personalized page where they can post vehicle pics, add descriptions,
@@ -40,7 +40,7 @@ const About = () => {
       </p>
 
       <p className="mb-4 text-lg leading-relaxed">
-        At MyGarage, it’s all about sharing the passion. So come on in, park
+        At MyTinHouse, it’s all about sharing the passion. So come on in, park
         your photos, and cruise around a bit. You’re in good company.
       </p>
     </div>
