@@ -48,6 +48,13 @@ app.use(
         'script-src': ["'self'", 'api.mapbox.com'],
         'worker-src': ["'self'", 'blob:'],
         'img-src': ["'self'", 'data:', 'res.cloudinary.com', 'api.mapbox.com'],
+        // This 'connect-src' line explicitly allows your frontend to fetch data
+        // from your Render backend and Mapbox.
+        'connect-src': [
+          "'self'",
+          'https://mygarage-app-3mvw.onrender.com',
+          'https://api.mapbox.com',
+        ],
       },
     },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
