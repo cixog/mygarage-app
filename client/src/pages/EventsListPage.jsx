@@ -145,8 +145,9 @@ export default function EventsListPage() {
               className="block px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
             >
               <div className="flex items-center">
-                <span className="font-semibold text-sm text-blue-600 w-20">
-                  {formatDateRange(event.startDate, event.endData)}
+                {/* --- FIX IS HERE (width and property name) --- */}
+                <span className="font-semibold text-sm text-blue-600 w-28 text-center">
+                  {formatDateRange(event.startDate, event.endDate)}
                 </span>
                 <span className="ml-4 font-medium text-gray-800">
                   {event.title}
