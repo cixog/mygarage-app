@@ -1,4 +1,4 @@
-// client/src/pages/AdminDashboard.jsx (Final, Expanded, and Corrected Version)
+// client/src/pages/AdminDashboard.jsx
 import { useEffect, useState } from 'react';
 import api from '../api/api';
 import toast from 'react-hot-toast';
@@ -257,6 +257,19 @@ export default function AdminDashboard() {
                   {new Date(selectedEvent.endDate).toLocaleString()}
                 </p>
               </div>
+              {selectedEvent.url && (
+                <div className="text-sm">
+                  <strong>Submitted URL:</strong>{' '}
+                  <a
+                    href={selectedEvent.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {selectedEvent.url}
+                  </a>
+                </div>
+              )}
               <div>
                 <h3 className="font-bold border-b pb-1 mb-2">
                   Short Description

@@ -14,6 +14,7 @@ export default function SubmitEventPage() {
     endDate: '',
     location: '',
     category: '', // Added for the category dropdown
+    url: '',
     shortDescription: '',
     fullDescription: '',
   });
@@ -111,6 +112,14 @@ export default function SubmitEventPage() {
           required
           className="w-full border rounded px-3 py-2"
         />
+        <input
+          type="url"
+          name="url"
+          placeholder="Event Website or Ticket URL (e.g., https://...)"
+          value={formData.url}
+          onChange={handleChange}
+          className="w-full border rounded px-3 py-2"
+        />
 
         {/* --- 5. NEW: Category Select Dropdown --- */}
         <div>
@@ -131,6 +140,7 @@ export default function SubmitEventPage() {
             <option value="" disabled>
               -- Please select a category --
             </option>
+            <option value="Car/Truck/Bike Show">Car/Truck/Bike Show</option>
             <option value="Cars & Coffee">Cars & Coffee</option>
             <option value="Track Day">Track Day</option>
             <option value="Concours">Concours</option>
@@ -141,7 +151,7 @@ export default function SubmitEventPage() {
           </select>
         </div>
 
-        {/* --- Text Inputs (Unchanged) --- */}
+        {/* --- Text Inputs  --- */}
         <input
           type="text"
           name="shortDescription"

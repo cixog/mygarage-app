@@ -17,6 +17,7 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     startDate,
     endDate,
     location,
+    url,
   } = req.body;
 
   const eventData = {
@@ -27,6 +28,7 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     startDate,
     endDate,
     location,
+    url,
     createdBy: req.user.id,
     submittedAt: Date.now(),
   };

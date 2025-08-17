@@ -64,11 +64,30 @@ export default function EventsListPage() {
     }));
   };
 
-  const formatDate = dateString => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
+  const formatDateRange = (startDateStr, endDateStr) => {
+    const options = { month: 'short', day: 'numeric' };
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    // If the dates are the same, just show one.
+    if (startDate.toDateString() === endDate.toDateString()) {
+      return startDate.toLocaleDateString('en-US', options);
+    }
+
+    // If the dates are in the same month, show as "Aug 25 - 26"
+    if (startDate.getMonth() === endDate.getMonth()) {
+      const startDay = startDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      const endDay = endDate.toLocaleDateString('en-US', { day: 'numeric' });
+      return `${startDay}-${endDay}`;
+    }
+
+    // Otherwise, show the full range "Aug 31 - Sep 2"
+    const startFormat = startDate.toLocaleDateString('en-US', options);
+    const endFormat = endDate.toLocaleDateString('en-US', options);
+    return `${startFormat} - ${endFormat}`;
   };
 
   return (
@@ -103,6 +122,7 @@ export default function EventsListPage() {
           className="w-full sm:w-1/3 border rounded px-3 py-2 bg-white"
         >
           <option value="">All Categories</option>
+          <option value="Car/Truck/Bike Show">Car/Truck/Bike Show</option>
           <option value="Cars & Coffee">Cars & Coffee</option>
           <option value="Track Day">Track Day</option>
           <option value="Concours">Concours</option>
@@ -113,8 +133,7 @@ export default function EventsListPage() {
         </select>
       </div>
 
-      {/* --- 5. MODIFIED DISPLAY LOGIC --- */}
-      {/* The loading check is now separate from the list display */}
+      {/* --- MODIFIED DISPLAY LOGIC --- */}
       {loading ? (
         <p className="text-center p-10">Loading events...</p>
       ) : events.length > 0 ? (
@@ -127,7 +146,7 @@ export default function EventsListPage() {
             >
               <div className="flex items-center">
                 <span className="font-semibold text-sm text-blue-600 w-20">
-                  {formatDate(event.startDate)}
+                  {formatDateRange(event.startDate, event.endData)}
                 </span>
                 <span className="ml-4 font-medium text-gray-800">
                   {event.title}

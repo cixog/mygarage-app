@@ -10,7 +10,7 @@ const About = () => {
         <Link to="/" className="font-semibold text-blue-600 hover:underline">
           TourMyGarage
         </Link>{' '}
-        - is the online hangout for gearheads, collectors, and anyone who loves
+        - an online hangout for gearheads, collectors, and anyone who loves
         cars, bikes, or anything moving down the road with an engine.
       </p>
 

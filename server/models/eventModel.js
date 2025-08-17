@@ -17,6 +17,10 @@ const eventSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    url: {
+      type: String,
+      trim: true,
+    },
     startDate: {
       type: Date,
       required: [true, 'An event must have a start date.'],
@@ -66,6 +70,7 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, 'An event must have a category.'],
       enum: [
+        'Car/Truck/Bike Show',
         'Cars & Coffee',
         'Track Day',
         'Concours',
