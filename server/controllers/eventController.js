@@ -58,6 +58,12 @@ export const submitEvent = catchAsync(async (req, res, next) => {
 export const getAllPublicEvents = catchAsync(async (req, res, next) => {
   const today = new Date();
 
+  // ✅ THIS IS THE FIX ✅
+  // If no sort order is specified in the URL, default to sorting by the start date.
+  if (!req.query.sort) {
+    req.query.sort = 'startDate';
+  }
+
   const features = new APIFeatures(
     Event.find({
       approved: true,
@@ -66,7 +72,7 @@ export const getAllPublicEvents = catchAsync(async (req, res, next) => {
     req.query
   )
     .filter()
-    .sort()
+    .sort() // This will now use 'startDate' as the default
     .limitFields()
     .paginate();
 
