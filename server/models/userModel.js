@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  signupOrder: {
+    type: Number,
+    select: false, // This ensures it's not sent in API responses by default
+  },
+
   password: {
     type: String,
     required: [true, 'A user must have a password'],

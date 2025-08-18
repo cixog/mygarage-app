@@ -5,6 +5,7 @@ import User from '../models/userModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import sendEmail from '../utils/email.js';
+import { getNextSequence } from '../utils/sequenceGenerator.js';
 
 // --- HELPER FUNCTIONS (No changes needed) ---
 const signToken = id => {
@@ -50,6 +51,12 @@ export const signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  // ✅ --- GET AND ASSIGN THE ORDER NUMBER ---
+  // Get the next number in the 'userOrder' sequence
+  const orderNumber = await getNextSequence('userOrder');
+  // Assign it to the new user document
+  newUser.signupOrder = orderNumber;
 
   const verificationToken = newUser.createEmailVerificationToken();
   await newUser.save();
