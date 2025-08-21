@@ -1,29 +1,47 @@
-// server/utils/email.js (Corrected with ES Modules)
-import nodemailer from 'nodemailer';
+// server/utils/email.js
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+
+// 1. Initialize the SES Client with credentials from your environment variables
+const sesClient = new SESClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 const sendEmail = async options => {
-  // 1) Create a transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
+  // 2. Create the parameter object in the format AWS SES expects
+  const params = {
+    Source: process.env.AWS_FROM_EMAIL, // The 'from' address you verified
+    Destination: {
+      ToAddresses: [options.email], // The recipient's email
     },
-  });
-
-  // 2) Define the email options
-  const mailOptions = {
-    from: 'MyGarage Admin <admin@mygarage.io>',
-    to: options.email,
-    subject: options.subject,
-    // --- THIS IS THE CHANGE ---
-    text: options.text, // The plain text version of the message
-    html: options.html, // The HTML version of the message
+    Message: {
+      Subject: {
+        Data: options.subject,
+      },
+      Body: {
+        Html: {
+          Data: options.html, // The HTML version of the email
+        },
+        Text: {
+          Data: options.text, // The plain text version
+        },
+      },
+    },
   };
 
-  // 3) Actually send the email
-  await transporter.sendMail(mailOptions);
+  try {
+    // 3. Create a new command and send it using the SES client
+    const command = new SendEmailCommand(params);
+    await sesClient.send(command);
+    console.log('Email sent successfully via AWS SES.');
+  } catch (error) {
+    console.error('Error sending email via AWS SES:', error);
+    // Re-throw the error so the calling function knows it failed
+    throw new Error('There was an error sending the email.');
+  }
 };
 
 export default sendEmail;
