@@ -71,6 +71,13 @@ const Navbar = () => {
             >
               Garages
             </Link>
+            {/* --- THIS IS THE ADDED LINK --- */}
+            <Link
+              to="/events"
+              className="text-gray-300 hover:text-white transition"
+            >
+              Events
+            </Link>
 
             {user ? (
               <div className="relative" ref={dropdownRef}>
