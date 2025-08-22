@@ -51,6 +51,14 @@ const Navbar = () => {
             />
           </Link>
 
+          {/* --- THIS IS THE ADDED LINK --- */}
+          <Link
+            to="/events"
+            className="text-gray-300 hover:text-white transition"
+          >
+            Events
+          </Link>
+
           <div className="flex-1 max-w-md mx-4">
             <form onSubmit={handleSearch}>
               <input
@@ -70,13 +78,6 @@ const Navbar = () => {
               className="text-gray-300 hover:text-white transition"
             >
               Garages
-            </Link>
-            {/* --- THIS IS THE ADDED LINK --- */}
-            <Link
-              to="/events"
-              className="text-gray-300 hover:text-white transition"
-            >
-              Events
             </Link>
 
             {user ? (
