@@ -29,7 +29,7 @@ export default function Footer() {
             </Link>
             {/* MODIFIED: Updated text color for visibility */}
             <p className="mt-2 text-sm text-gray-400">
-              The premier community for showcasing car collections.
+              A community for showcasing car collections.
             </p>
           </div>
 
