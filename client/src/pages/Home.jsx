@@ -64,7 +64,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="bg-gray-100 px-4 py-12 text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">
-          Welcome to MyGarage
+          Welcome to TourMyGarage
         </h1>
         <p className="text-lg text-gray-600">
           The premier community for showcasing car collections.
