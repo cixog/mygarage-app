@@ -73,13 +73,13 @@ export default function LoginModal({ isOpen, onClose }) {
       {/* Modal Content */}
       <div className="relative z-10 w-full max-w-md p-6 bg-white rounded-xl shadow-xl">
         <div className="text-center mb-4">
-          <h1 className="text-5xl font-bold text-blue-600">MyG</h1>
+          <h1 className="text-5xl font-bold text-blue-600">TourMyGarage</h1>
         </div>
 
         <h2 className="text-xl font-semibold text-center mb-2">Log in</h2>
 
         <p className="text-sm text-center text-gray-600 mb-4">
-          Not registered with MyGarage?{' '}
+          Not registered with TourMyGarage?{' '}
           <Link
             to="/signup"
             onClick={onClose}
