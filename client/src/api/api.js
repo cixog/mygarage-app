@@ -23,9 +23,20 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    // --- THIS IS THE DEFINITIVE FIX ---
+    const originalRequestUrl = error.config.url || ''; // Ensure the URL is a string to prevent errors
+
+    // This check is now robust. It works if the url is '/users/login' or 'https://api.com/v1/users/login'.
+    if (
+      error.response?.status === 401 &&
+      !originalRequestUrl.endsWith('/users/login')
+    ) {
+      // This is an expired session or unauthorized action on another page. Redirect.
       window.location.href = '/';
     }
+
+    // For any other error, including a 401 on the login page, just pass the error along
+    // so the component's catch block can handle it.
     return Promise.reject(error);
   }
 );
