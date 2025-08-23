@@ -37,17 +37,19 @@ export default function LoginModal({ isOpen, onClose }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
+    setError(''); // Clear previous errors
     setIsSubmitting(true);
     try {
+      // This will now succeed or fail without a redirect
       await login(formData.email, formData.password);
       toast.success('Login successful!');
-      onClose();
-      navigate('/profile');
+      onClose(); // Close modal ON SUCCESS
+      navigate('/profile'); // Navigate ON SUCCESS
     } catch (err) {
+      // THIS BLOCK IS NOW THE FINAL DESTINATION FOR LOGIN ERRORS
       const msg =
         err.response?.data?.message || 'Login failed. Check your credentials.';
-      setError(msg);
+      setError(msg); // The error message is set to state...
     } finally {
       setIsSubmitting(false);
     }
