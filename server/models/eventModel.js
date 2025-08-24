@@ -36,7 +36,12 @@ const eventSchema = new mongoose.Schema(
         default: 'Point',
       },
       coordinates: [Number], // [longitude, latitude]
-      address: String,
+      // --- MODIFICATION START ---
+      // Replace the single 'address' string with these fields
+      address: { type: String, trim: true },
+      city: { type: String, trim: true },
+      state: { type: String, trim: true },
+      // --- MODIFICATION END ---
     },
     image: String,
     // This flag is controlled by the admin workflow
@@ -91,6 +96,16 @@ const eventSchema = new mongoose.Schema(
 // Indexes for performance
 eventSchema.index({ location: '2dsphere' });
 eventSchema.index({ startDate: 1, approved: 1 });
+
+// --- NEW VIRTUAL PROPERTY ---
+// This creates a full, readable address string without storing it directly.
+eventSchema.virtual('fullAddress').get(function () {
+  let parts = [];
+  if (this.location?.address) parts.push(this.location.address);
+  if (this.location?.city) parts.push(this.location.city);
+  if (this.location?.state) parts.push(this.location.state);
+  return parts.join(', ');
+});
 
 const Event = mongoose.model('Event', eventSchema);
 

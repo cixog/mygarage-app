@@ -5,6 +5,7 @@ import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
 import sendEmail from '../utils/email.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import geocode from '../utils/geocoder.js';
 
 // FOR USERS: Submit an event for review
 export const submitEvent = catchAsync(async (req, res, next) => {
@@ -16,9 +17,26 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     fullDescription,
     startDate,
     endDate,
-    location,
+    address, // New field
+    city, // New field
+    state, // New field
     url,
   } = req.body;
+
+  // Construct a full address string for geocoding
+  const fullAddressForGeocoding = [address, city, state]
+    .filter(Boolean)
+    .join(', ');
+
+  let coordinates;
+  try {
+    const [longitude, latitude] = await geocode(fullAddressForGeocoding);
+    coordinates = [longitude, latitude];
+  } catch (err) {
+    // It's better to let them submit without coordinates than to fail completely.
+    // You can decide if you want to make this a hard requirement.
+    console.warn(`Could not geocode address: ${fullAddressForGeocoding}`);
+  }
 
   const eventData = {
     title,
@@ -27,7 +45,12 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     fullDescription,
     startDate,
     endDate,
-    location,
+    location: {
+      address,
+      city,
+      state,
+      coordinates,
+    },
     url,
     createdBy: req.user.id,
     submittedAt: Date.now(),

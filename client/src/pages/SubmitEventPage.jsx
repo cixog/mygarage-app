@@ -12,8 +12,10 @@ export default function SubmitEventPage() {
     title: '',
     startDate: '',
     endDate: '',
-    location: '',
-    category: '', // Added for the category dropdown
+    address: '', // New
+    city: '', // New
+    state: '', // New
+    category: '',
     url: '',
     shortDescription: '',
     fullDescription: '',
@@ -103,15 +105,37 @@ export default function SubmitEventPage() {
             className="w-full border rounded px-3 py-2"
           />
         </div>
+
+        {/* --- 2. MODIFICATION: Replace single location input --- */}
         <input
           type="text"
-          name="location"
-          placeholder="Location (e.g., City, Venue)"
-          value={formData.location}
+          name="address"
+          placeholder="Street Address (e.g., 123 Main St)"
+          value={formData.address}
           onChange={handleChange}
-          required
           className="w-full border rounded px-3 py-2"
         />
+        <div className="flex gap-4">
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            value={formData.city}
+            onChange={handleChange}
+            required
+            className="w-2/3 border rounded px-3 py-2"
+          />
+          <input
+            type="text"
+            name="state"
+            placeholder="State (e.g., CA)"
+            value={formData.state}
+            onChange={handleChange}
+            required
+            className="w-1/3 border rounded px-3 py-2"
+          />
+        </div>
+
         <input
           type="url"
           name="url"
@@ -121,7 +145,7 @@ export default function SubmitEventPage() {
           className="w-full border rounded px-3 py-2"
         />
 
-        {/* --- 5. NEW: Category Select Dropdown --- */}
+        {/* --- Category Select Dropdown --- */}
         <div>
           <label
             htmlFor="category"

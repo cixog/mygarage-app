@@ -138,29 +138,53 @@ export default function EventsListPage() {
         <p className="text-center p-10">Loading events...</p>
       ) : events.length > 0 ? (
         <div className="bg-white rounded-lg shadow-md border">
-          {events.map(event => (
-            <Link
-              key={event._id}
-              to={`/events/${event._id}`}
-              className="block px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
-            >
-              <div className="flex items-center">
-                {/* --- FIX IS HERE (width and property name) --- */}
-                <span className="font-semibold text-sm text-blue-600 w-28 text-center">
+          {events.map(event => {
+            // Helper to create the map link
+            const mapQuery = encodeURIComponent(
+              `${event.location?.address || ''} ${
+                event.location?.city || ''
+              }, ${event.location?.state || ''}`
+            );
+            const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+            return (
+              <Link
+                key={event._id}
+                to={`/events/${event._id}`}
+                // Use flexbox for the three-column layout
+                className="flex items-center px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
+              >
+                {/* Column 1: Dates (Fixed Width) */}
+                <div className="w-28 flex-shrink-0 font-semibold text-sm text-blue-600 text-left">
                   {formatDateRange(event.startDate, event.endDate)}
-                </span>
-                <span className="ml-4 font-medium text-gray-800">
+                </div>
+
+                {/* Column 2: Event Title (Flexible Width) */}
+                <div className="flex-grow px-4 font-medium text-gray-800 text-left">
                   {event.title}
-                </span>
-                <span className="ml-auto text-sm text-gray-500">
-                  {event.location?.address || ''}
-                </span>
-              </div>
-            </Link>
-          ))}
+                </div>
+
+                {/* Column 3: Location (Right-aligned) */}
+                <div className="flex-shrink-0 text-sm text-gray-500 text-right">
+                  {event.location?.city && event.location?.state ? (
+                    <a
+                      href={mapLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()} // Prevents the Link navigation
+                      className="hover:underline hover:text-blue-600"
+                    >
+                      {event.location.city}, {event.location.state}
+                    </a>
+                  ) : (
+                    <span>Location TBD</span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       ) : (
-        // This message now correctly reflects that filters might be active.
         <p className="text-center text-gray-500 py-10">
           No events found that match your criteria.
         </p>
