@@ -68,7 +68,19 @@ export default function EventDetailPage() {
             : 'Not specified'}
         </p>
         <p>
-          <strong>Online:</strong> {event.url || 'Not specified'}
+          <strong>Online:</strong>{' '}
+          {event.url ? (
+            <a
+              href={event.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              {event.url}
+            </a>
+          ) : (
+            'Not specified'
+          )}
         </p>
       </div>
       <div className="prose max-w-none mt-6">
