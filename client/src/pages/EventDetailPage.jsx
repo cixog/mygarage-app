@@ -62,6 +62,9 @@ export default function EventDetailPage() {
         <p>
           <strong>Where:</strong> {event.location?.address || 'Not specified'}
         </p>
+        <p>
+          <strong>Online:</strong> {event.url || 'Not specified'}
+        </p>
       </div>
       <div className="prose max-w-none mt-6">
         <p className="font-semibold">{event.shortDescription}</p>
