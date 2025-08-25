@@ -60,7 +60,12 @@ export default function EventDetailPage() {
           {formatDateRange(event.startDate, event.endDate)}
         </p>
         <p>
-          <strong>Where:</strong> {event.location?.address || 'Not specified'}
+          <strong>Where:</strong>{' '}
+          {event.location
+            ? `${event.location.address || 'Not specified'}, ${
+                event.location.city
+              }, ${event.location.state}`
+            : 'Not specified'}
         </p>
         <p>
           <strong>Online:</strong> {event.url || 'Not specified'}
