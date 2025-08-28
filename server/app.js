@@ -62,7 +62,7 @@ app.use(
         // from your Render backend and Mapbox.
         'connect-src': [
           "'self'",
-          'https://mygarage-app-3mvw.onrender.com',
+          'https://mygarage-app-1.onrender.com',
           'https://api.mapbox.com',
         ],
       },
