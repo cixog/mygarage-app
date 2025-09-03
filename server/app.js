@@ -11,7 +11,7 @@ import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import AppError from './utils/AppError.js';
+//import AppError from './utils/AppError.js';
 import globalErrorHandler from './controllers/errorController.js';
 import garageRouter from './routes/garageRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -100,16 +100,16 @@ app.use('/api/v1/search', searchRouter);
 app.use('/api/v1/events', eventRouter);
 app.use('/api/v1/tickets', ticketRouter);
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
-  });
-}
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../client/dist')));
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+//   });
+// }
 
-app.all('/api/*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-});
+// app.all('/api/*', (req, res, next) => {
+//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+// });
 
 app.use(globalErrorHandler);
 
