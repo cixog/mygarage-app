@@ -41,6 +41,14 @@ if (process.env.CLIENT_URL) {
   allowedOrigins.push(process.env.CLIENT_URL); // e.g., https://www.tourmygarage.com
   allowedOrigins.push(process.env.CLIENT_URL.replace('www.', '')); // e.g., https://tourmygarage.com
 }
+if (process.env.CORS_ORIGINS) {
+  process.env.CORS_ORIGINS.split(',').forEach(origin => {
+    const trimmedOrigin = origin.trim();
+    if (trimmedOrigin && !allowedOrigins.includes(trimmedOrigin)) {
+      allowedOrigins.push(trimmedOrigin);
+    }
+  });
+}
 
 app.use(
   cors({
@@ -62,7 +70,9 @@ app.use(
         // from your Render backend and Mapbox.
         'connect-src': [
           "'self'",
-          'https://mygarage-app-1.onrender.com', // 3mvw
+          'https://www.tourmygarage.com', // Your frontend domain
+          'https://tourmygarage.com', // Your non-www frontend domain
+          'https://mygarage-back-ccbs.onrender.com', // Your NEW backend domain
           'https://api.mapbox.com',
         ],
       },
@@ -89,7 +99,7 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1/garages', garageRouter);
 app.use('/api/v1/users', userRouter);
