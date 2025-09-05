@@ -61,7 +61,9 @@ export const signup = catchAsync(async (req, res, next) => {
   const verificationToken = newUser.createEmailVerificationToken();
   await newUser.save();
 
-  const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+  // Ensure you have an environment variable for your backend's API base URL
+  // Let's assume you'll add process.env.BACKEND_API_URL or process.env.API_BASE_URL
+  const verificationURL = `${process.env.BACKEND_API_URL}/api/v1/users/verify-email/${verificationToken}`;
   // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
   const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
