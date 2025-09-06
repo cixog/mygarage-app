@@ -63,7 +63,8 @@ export const signup = catchAsync(async (req, res, next) => {
 
   // Ensure you have an environment variable for your backend's API base URL
   // Let's assume you'll add process.env.BACKEND_API_URL or process.env.API_BASE_URL
-  const verificationURL = `${process.env.BACKEND_API_URL}/api/v1/users/verify-email/${verificationToken}`;
+  const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+  //const verificationURL = `${process.env.BACKEND_API_URL}/api/v1/users/verify-email/${verificationToken}`; OLD
   // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
   const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
@@ -137,11 +138,30 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
   user.emailVerificationExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
-  // Automatically log the user in after verification
-  createSendToken(user, 200, res);
-});
+  // Send a JSON success response. The frontend VerifyEmailPage.jsx
+  // will then handle logging in and redirection.
+  // Your frontend expects `token` and `data.user` here.
+  // So, for now, let's include the token in the response:
+  const authToken = signToken(user._id); // Generate token for frontend to store
+  const minimalUser = {
+    // Minimal user data for frontend
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    garage: user.garage,
+    role: user.role,
+    following: user.following,
+  };
 
-// --- The rest of the file remains unchanged ---
+  res.status(200).json({
+    status: 'success',
+    token: authToken, // Frontend expects this for localStorage
+    data: {
+      user: minimalUser,
+    },
+  });
+});
 
 export const logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
