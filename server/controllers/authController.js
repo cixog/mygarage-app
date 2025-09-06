@@ -138,29 +138,8 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
   user.emailVerificationExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
-  // Send a JSON success response. The frontend VerifyEmailPage.jsx
-  // will then handle logging in and redirection.
-  // Your frontend expects `token` and `data.user` here.
-  // So, for now, let's include the token in the response:
-  const authToken = signToken(user._id); // Generate token for frontend to store
-  const minimalUser = {
-    // Minimal user data for frontend
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
-    garage: user.garage,
-    role: user.role,
-    following: user.following,
-  };
-
-  res.status(200).json({
-    status: 'success',
-    token: authToken, // Frontend expects this for localStorage
-    data: {
-      user: minimalUser,
-    },
-  });
+  // Automatically log the user in after verification
+  createSendToken(user, 200, res);
 });
 
 export const logout = (req, res) => {
