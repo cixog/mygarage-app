@@ -128,6 +128,7 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
     emailVerificationToken: hashedToken,
     emailVerificationExpires: { $gt: Date.now() },
   });
+  //.populate('garage'); // ✅ ADD THIS LINE: Populate the garage here
 
   if (!user) {
     return next(new AppError('Token is invalid or has expired.', 400));
