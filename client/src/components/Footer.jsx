@@ -78,7 +78,7 @@ export default function Footer() {
 
         {/* MODIFIED: Updated border and text colors */}
         <div className="mt-8 border-t border-gray-800 pt-6 text-center text-sm text-gray-400">
-          <p>©{new Date().getFullYear()} MyGarage. All rights reserved.</p>
+          <p>©{new Date().getFullYear()} TourMyGarage. All rights reserved.</p>
         </div>
       </div>
     </footer>

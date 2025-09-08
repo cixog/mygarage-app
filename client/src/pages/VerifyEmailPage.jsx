@@ -27,9 +27,21 @@ export default function VerifyEmailPage() {
         const { token: authToken, data } = res.data;
 
         console.log(
-          'VerifyEmailPage: API call successful, response:',
-          res.data
+          'VerifyEmailPage: API call successful, raw response data:',
+          data
         ); // NEW LOG 4
+
+        // --- ADD THESE NEW LOGS ---
+        console.log('VerifyEmailPage: Data user object:', data.user);
+        console.log(
+          'VerifyEmailPage: Value of data.user.garage:',
+          data.user.garage
+        );
+        console.log(
+          'VerifyEmailPage: Is data.user.garage truthy?',
+          !!data.user.garage
+        );
+        // --- END NEW LOGS ---
 
         // Log the user in
         localStorage.setItem('token', authToken);
