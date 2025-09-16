@@ -242,18 +242,18 @@ export default function VehiclePage() {
         <div className="md:col-span-2 space-y-6">
           <div>
             <h2 className="text-2xl font-semibold border-b pb-2 mb-3">
-              Owner's Story
-            </h2>
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {vehicle.story || 'No story has been added for this vehicle.'}
-            </p>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold border-b pb-2 mb-3">
               Description
             </h2>
             <p className="text-gray-700 whitespace-pre-wrap">
               {vehicle.description || 'No description provided.'}
+            </p>
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold border-b pb-2 mb-3">
+              Owner's Story
+            </h2>
+            <p className="text-gray-700 whitespace-pre-wrap">
+              {vehicle.story || 'No story has been added for this vehicle.'}
             </p>
           </div>
         </div>
