@@ -41,6 +41,16 @@ const vehicleSchema = new mongoose.Schema(
     tags: [String],
     condition: String,
 
+    mileage: {
+      type: Number,
+      default: 0,
+    },
+    fuelType: {
+      type: String,
+      enum: ['Gasoline', 'Diesel', 'Electric', 'Hybrid', 'Other'],
+      default: 'Gasoline',
+    },
+
     // --- CHILD RELATIONSHIP ---
     photos: [{ type: mongoose.Schema.ObjectId, ref: 'Photo' }],
 

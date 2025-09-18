@@ -37,9 +37,16 @@ app.set('trust proxy', 1);
 // We check if the CLIENT_URL environment variable is set. If it is, we create
 // an array containing both versions.
 const allowedOrigins = [];
+// --- THIS IS THE FIX ---
+// Conditionally add the localhost URL if in a development environment.
+if (process.env.NODE_ENV === 'development') {
+  allowedOrigins.push('http://localhost:5173');
+}
+
+// Your existing production logic to handle CLIENT_URL and CORS_ORIGINS
 if (process.env.CLIENT_URL) {
-  allowedOrigins.push(process.env.CLIENT_URL); // e.g., https://www.tourmygarage.com
-  allowedOrigins.push(process.env.CLIENT_URL.replace('www.', '')); // e.g., https://tourmygarage.com
+  allowedOrigins.push(process.env.CLIENT_URL);
+  allowedOrigins.push(process.env.CLIENT_URL.replace('www.', ''));
 }
 if (process.env.CORS_ORIGINS) {
   process.env.CORS_ORIGINS.split(',').forEach(origin => {

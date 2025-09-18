@@ -12,6 +12,8 @@ export default function EditVehicleForm({ vehicle, onUpdateSuccess }) {
     description: '',
     story: '',
     condition: '',
+    mileage: '',
+    fuelType: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,6 +27,8 @@ export default function EditVehicleForm({ vehicle, onUpdateSuccess }) {
         description: vehicle.description || '',
         story: vehicle.story || '',
         condition: vehicle.condition || '',
+        mileage: vehicle.mileage || '',
+        fuelType: vehicle.fuelType || '',
       });
     }
   }, [vehicle]);
@@ -83,14 +87,37 @@ export default function EditVehicleForm({ vehicle, onUpdateSuccess }) {
           className="w-full border rounded px-3 py-2"
         />
       </div>
-      <input
-        type="text"
-        name="condition"
-        placeholder="Condition (e.g., Excellent, Project)"
-        value={formData.condition}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          type="text"
+          name="condition"
+          placeholder="Condition (e.g., Excellent, Project)"
+          value={formData.condition}
+          onChange={handleChange}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="number"
+          name="mileage"
+          placeholder="Mileage"
+          value={formData.mileage}
+          onChange={handleChange}
+          className="w-full border rounded px-3 py-2"
+        />
+        <select
+          name="fuelType"
+          value={formData.fuelType}
+          onChange={handleChange}
+          className="w-full border rounded px-3 py-2 bg-white"
+        >
+          <option value="">Select Fuel Type</option>
+          <option value="Gasoline">Gasoline</option>
+          <option value="Diesel">Diesel</option>
+          <option value="Electric">Electric</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
       <textarea
         name="description"
         placeholder="A short description..."

@@ -172,6 +172,8 @@ export default function VehiclePage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-8">
+      {/* ... existing JSX for hero image, title, and buttons */}
+
       <div className="w-full aspect-video bg-gray-900 rounded-lg shadow-lg overflow-hidden">
         <img
           src={coverPhotoUrl}
@@ -264,6 +266,17 @@ export default function VehiclePage() {
               <VehicleStat label="Make" value={vehicle.make} />
               <VehicleStat label="Model" value={vehicle.model} />
               <VehicleStat label="Year" value={vehicle.year} />
+              {vehicle.mileage > 0 ? (
+                <VehicleStat
+                  label="Mileage"
+                  value={`${vehicle.mileage.toLocaleString()} miles`}
+                />
+              ) : (
+                <VehicleStat label="Mileage" value="Not specified" />
+              )}
+              {vehicle.fuelType && (
+                <VehicleStat label="Fuel Type" value={vehicle.fuelType} />
+              )}
               <VehicleStat
                 label="Condition"
                 value={vehicle.condition || 'Not specified'}
