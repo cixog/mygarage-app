@@ -1,6 +1,15 @@
 import nodemailer from 'nodemailer';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
+// Initialize the SES Client once at the top of the module.
+const sesClient = new SESClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
 // Logic for sending emails via AWS SES (for production)
 const sendEmailSES = async options => {
   // Check for required AWS environment variables
@@ -14,14 +23,6 @@ const sendEmailSES = async options => {
     );
     throw new Error('AWS SES credentials not configured.');
   }
-
-  const sesClient = new SESClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
 
   const params = {
     Source: process.env.AWS_FROM_EMAIL,
@@ -68,7 +69,6 @@ const sendEmailMailtrap = async options => {
     throw new Error('Mailtrap credentials not configured.');
   }
 
-  // Create a reusable transporter object using the provided SMTP transport
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -76,8 +76,6 @@ const sendEmailMailtrap = async options => {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
     },
-    // Adding secure: false for Mailtrap (as it's not a production TLS connection)
-    secure: false,
   });
 
   const mailOptions = {
@@ -99,11 +97,9 @@ const sendEmailMailtrap = async options => {
 
 // Main function that exports the correct email service based on the environment
 const sendEmail = async options => {
-  // The 'production' check should be the first condition
   if (process.env.NODE_ENV === 'production') {
     return sendEmailSES(options);
   } else {
-    // All other environments (development, test, etc.) will use Mailtrap
     return sendEmailMailtrap(options);
   }
 };
