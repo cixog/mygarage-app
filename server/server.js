@@ -12,6 +12,14 @@ process.on('uncaughtException', err => {
 // Load environment variables from config.env
 dotenv.config({ path: './config.env' });
 
+// 👇 ADD THESE LINES
+console.log('Environment from config:', process.env.NODE_ENV); // Add this log to verify
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
+  process.env.NODE_ENV = 'development';
+}
+console.log('Final NODE_ENV:', process.env.NODE_ENV);
+// 👆 END ADDED LINES
+
 // --- THIS IS THE KEY IMPORT ---
 // This file correctly imports `app.js` using a relative path.
 // It does NOT import any controllers.
