@@ -1,13 +1,11 @@
 // server/server.js
+
 import mongoose from 'mongoose';
-//import dotenv from 'dotenv';
 import app from './app.js';
-
-// Load environment variables from config.env
-//dotenv.config({ path: './config.env' });
-
-// Now, after dotenv has loaded the variables, initialize the email client.
 import { initEmailClient } from './utils/email.js';
+
+// Initialize the email client once at application startup.
+// This sets the email client based on the NODE_ENV.
 const sendEmail = initEmailClient();
 
 // Handle any uncaught exceptions at the very top
@@ -17,10 +15,6 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-console.log('Environment from config:', process.env.NODE_ENV);
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
-  process.env.NODE_ENV = 'development';
-}
 console.log('Final NODE_ENV:', process.env.NODE_ENV);
 
 const DB = process.env.DATABASE;
@@ -53,3 +47,8 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+// We need to export this, but server.js is the entry point, so we can't directly export.
+// A cleaner way is to store it and retrieve it from another file, but for a quick fix, let's pass it.
+// This approach is not ideal, but it's a minimal change to get your app working.
+app.set('emailClient', sendEmail);
