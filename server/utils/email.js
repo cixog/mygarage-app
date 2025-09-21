@@ -2,16 +2,12 @@ import nodemailer from 'nodemailer';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
 let sesClient;
-// This function will be called once on startup to determine the environment
 const getEmailClient = () => {
-  // Check for production-specific AWS credentials. This is the most reliable check.
-  const isProduction =
-    process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
+  const isProduction = process.env.NODE_ENV === 'production';
 
   if (isProduction) {
     try {
       console.log('Attempting to initialize SES client in production mode.');
-
       sesClient = new SESClient({
         region: process.env.AWS_REGION,
         credentials: {
@@ -21,7 +17,6 @@ const getEmailClient = () => {
       });
       console.log('SES client initialized for production.');
 
-      // Return the production email function
       return async options => {
         const params = {
           Source: process.env.AWS_FROM_EMAIL,
@@ -34,7 +29,6 @@ const getEmailClient = () => {
             },
           },
         };
-
         try {
           const command = new SendEmailCommand(params);
           await sesClient.send(command);
@@ -46,17 +40,22 @@ const getEmailClient = () => {
       };
     } catch (error) {
       console.error('Failed to initialize AWS SES client:', error);
-      // Fallback to development client if production fails to initialize
       return getDevelopmentEmailClient();
     }
   } else {
-    // If not production, return the development client
     console.log('Using development email client (Mailtrap).');
     return getDevelopmentEmailClient();
   }
 };
 
 const getDevelopmentEmailClient = () => {
+  console.log('Mailtrap Config:', {
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    username: process.env.EMAIL_USERNAME,
+    password: process.env.EMAIL_PASSWORD,
+  });
+
   if (
     !process.env.EMAIL_HOST ||
     !process.env.EMAIL_PORT ||
@@ -96,7 +95,4 @@ const getDevelopmentEmailClient = () => {
   };
 };
 
-// Main export that selects the correct client based on the environment
-const sendEmail = getEmailClient();
-
-export default sendEmail;
+export const initEmailClient = () => getEmailClient();

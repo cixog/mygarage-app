@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
-import sendEmail from '../utils/email.js';
+import { initEmailClient } from '../utils/email.js';
 import { getNextSequence } from '../utils/sequenceGenerator.js';
 
 // --- HELPER FUNCTIONS (No changes needed) ---
@@ -68,6 +68,9 @@ export const signup = catchAsync(async (req, res, next) => {
   // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to MyGarage! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
   const htmlMessage = `<p>Welcome to MyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
+
+  // ✅ --- INITIALIZE THE EMAIL CLIENT HERE ---
+  const sendEmail = initEmailClient();
 
   try {
     await sendEmail({
@@ -207,6 +210,9 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   // --- MODIFICATION 3: Create both text and HTML messages ---
   const textMessage = `Forgot your password? Copy and paste this link to reset it (valid for 10 minutes):\n\n${resetURL}\n\nIf you didn't forget your password, please ignore this email!`;
   const htmlMessage = `<p>Forgot your password? Please <a href="${resetURL}">click here to reset your password</a> (the link is valid for 10 minutes).</p><p>If you didn't request this, please ignore this email.</p>`;
+
+  // ✅ --- INITIALIZE THE EMAIL CLIENT HERE ---
+  const sendEmail = initEmailClient();
 
   try {
     await sendEmail({

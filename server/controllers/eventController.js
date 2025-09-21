@@ -3,7 +3,8 @@ import Event from '../models/eventModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
-import sendEmail from '../utils/email.js';
+import { initEmailClient } from '../utils/email.js';
+const sendEmail = initEmailClient();
 import APIFeatures from '../utils/apiFeatures.js';
 import geocode from '../utils/geocoder.js';
 

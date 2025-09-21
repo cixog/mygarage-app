@@ -1,6 +1,14 @@
-// server/server.js (Correct and Final Version)
+// server/server.js
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+//import dotenv from 'dotenv';
+import app from './app.js';
+
+// Load environment variables from config.env
+//dotenv.config({ path: './config.env' });
+
+// Now, after dotenv has loaded the variables, initialize the email client.
+import { initEmailClient } from './utils/email.js';
+const sendEmail = initEmailClient();
 
 // Handle any uncaught exceptions at the very top
 process.on('uncaughtException', err => {
@@ -9,32 +17,19 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-// Load environment variables from config.env
-dotenv.config({ path: './config.env' });
-
-// 👇 ADD THESE LINES
-console.log('Environment from config:', process.env.NODE_ENV); // Add this log to verify
+console.log('Environment from config:', process.env.NODE_ENV);
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
   process.env.NODE_ENV = 'development';
 }
 console.log('Final NODE_ENV:', process.env.NODE_ENV);
-// 👆 END ADDED LINES
 
-// --- THIS IS THE KEY IMPORT ---
-// This file correctly imports `app.js` using a relative path.
-// It does NOT import any controllers.
-import app from './app.js';
-
-// Get the database connection string from the environment
 const DB = process.env.DATABASE;
 
-// Check if the DATABASE variable exists
 if (!DB) {
   console.error('FATAL ERROR: DATABASE environment variable not found!');
-  process.exit(1); // Stop the server if the connection string is missing
+  process.exit(1);
 }
 
-// Connect to MongoDB and log the result for diagnostics
 mongoose
   .connect(DB)
   .then(conn => {
@@ -46,13 +41,11 @@ mongoose
     console.error('❌ DB Connection Error:', err.message);
   });
 
-// Start the Express server
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
 
-// Handle any unhandled promise rejections (like a bad DB password)
 process.on('unhandledRejection', err => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
   console.log(err.name, err.message);
