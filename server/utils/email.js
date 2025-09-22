@@ -28,6 +28,7 @@ const getEmailClient = () => {
               Text: { Data: options.text },
             },
           },
+          ReplyToAddresses: ['support@tourmygarage.com'], // 👈 NEW LINE: THIS IS THE KEY!
         };
         try {
           const command = new SendEmailCommand(params);
@@ -84,6 +85,7 @@ const getDevelopmentEmailClient = () => {
       subject: options.subject,
       html: options.html,
       text: options.text,
+      replyTo: 'support@tourmygarage.com', // 👈 NEW LINE: Added for consistency in dev
     };
     try {
       await transporter.sendMail(mailOptions);
