@@ -1,100 +1,263 @@
-import nodemailer from 'nodemailer';
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import crypto from 'crypto';
+import { promisify } from 'util';
+import jwt from 'jsonwebtoken';
+import User from '../models/userModel.js';
+import catchAsync from '../utils/catchAsync.js';
+import AppError from '../utils/AppError.js';
+import { getNextSequence } from '../utils/sequenceGenerator.js';
 
-let sesClient;
-const getEmailClient = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  if (isProduction) {
-    try {
-      console.log('Attempting to initialize SES client in production mode.');
-      sesClient = new SESClient({
-        region: process.env.AWS_REGION,
-        credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        },
-      });
-      console.log('SES client initialized for production.');
-
-      return async options => {
-        const params = {
-          Source: process.env.AWS_FROM_EMAIL,
-          Destination: { ToAddresses: [options.email] },
-          Message: {
-            Subject: { Data: options.subject },
-            Body: {
-              Html: { Data: options.html },
-              Text: { Data: options.text },
-            },
-          },
-          ReplyToAddresses: ['support@tourmygarage.com'], // 👈 NEW LINE: THIS IS THE KEY!
-        };
-        try {
-          const command = new SendEmailCommand(params);
-          await sesClient.send(command);
-          console.log('Email sent successfully via AWS SES.');
-        } catch (error) {
-          console.error('Error sending email via AWS SES:', error);
-          throw new Error('There was an error sending the email.');
-        }
-      };
-    } catch (error) {
-      console.error('Failed to initialize AWS SES client:', error);
-      return getDevelopmentEmailClient();
-    }
-  } else {
-    console.log('Using development email client (Mailtrap).');
-    return getDevelopmentEmailClient();
-  }
+// --- HELPER FUNCTIONS (No changes needed) ---
+const signToken = id => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 };
 
-const getDevelopmentEmailClient = () => {
-  console.log('Mailtrap Config:', {
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    username: process.env.EMAIL_USERNAME,
-    password: process.env.EMAIL_PASSWORD,
-  });
-
-  if (
-    !process.env.EMAIL_HOST ||
-    !process.env.EMAIL_PORT ||
-    !process.env.EMAIL_USERNAME ||
-    !process.env.EMAIL_PASSWORD
-  ) {
-    console.error(
-      'Mailtrap environment variables are missing. Please check your .env file.'
-    );
-    throw new Error('Mailtrap credentials not configured.');
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  };
+  res.cookie('jwt', token, cookieOptions);
+  const minimalUser = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    garage: user.garage,
+    role: user.role,
+    following: user.following,
+  };
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user: minimalUser,
     },
   });
+};
 
-  return async options => {
-    const mailOptions = {
-      from: `Your App <${process.env.EMAIL_USERNAME}>`,
-      to: options.email,
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-      replyTo: 'support@tourmygarage.com', // 👈 NEW LINE: Added for consistency in dev
-    };
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log('Email sent successfully via Mailtrap.');
-    } catch (error) {
-      console.error('Error sending email via Mailtrap:', error);
-      throw new Error('There was an error sending the email.');
+// --- CORE AUTH CONTROLLERS ---
+
+export const signup = catchAsync(async (req, res, next) => {
+  const newUser = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+  });
+
+  // ✅ --- GET AND ASSIGN THE ORDER NUMBER ---
+  // Get the next number in the 'userOrder' sequence
+  const orderNumber = await getNextSequence('userOrder');
+  // Assign it to the new user document
+  newUser.signupOrder = orderNumber;
+
+  const verificationToken = newUser.createEmailVerificationToken();
+  await newUser.save();
+
+  // Ensure you have an environment variable for your backend's API base URL
+  // Let's assume you'll add process.env.BACKEND_API_URL or process.env.API_BASE_URL
+  const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+  //const verificationURL = `${process.env.BACKEND_API_URL}/api/v1/users/verify-email/${verificationToken}`; OLD
+  // --- MODIFICATION 1: Create both text and HTML messages ---
+  const textMessage = `Welcome to TourMyGarage.com! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
+  const htmlMessage = `<p>Welcome to TourMyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
+
+  // ✅ --- INITIALIZE THE EMAIL CLIENT HERE ---
+  const sendEmail = req.app.get('emailClient');
+
+  try {
+    await sendEmail({
+      email: newUser.email,
+      subject: 'MyGarage: Please Verify Your Email Address',
+      text: textMessage, // Pass the text version
+      html: htmlMessage, // Pass the HTML version
+    });
+  } catch (err) {
+    await User.findByIdAndDelete(newUser._id);
+    return next(
+      new AppError(
+        'Failed to send verification email. Please use a valid email address and try again.',
+        502
+      )
+    );
+  }
+
+  res.status(201).json({
+    status: 'success',
+    message: 'Account created! Please check your email to verify your account.',
+  });
+});
+
+export const login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return next(new AppError('Please provide email and password', 400));
+  }
+  const user = await User.findOne({ email })
+    .populate('garage')
+    .select('+password');
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
+
+  // **IMPROVEMENT**: Check if the user is verified
+  if (!user.isVerified) {
+    return next(
+      new AppError(
+        'Your account is not verified. Please check your email for a verification link.',
+        401
+      )
+    );
+  }
+
+  createSendToken(user, 200, res);
+});
+
+export const verifyEmail = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpires: { $gt: Date.now() },
+  }).populate('garage'); // ✅ ADD THIS LINE: Populate the garage here
+
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired.', 400));
+  }
+
+  user.isVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  // Automatically log the user in after verification
+  createSendToken(user, 200, res);
+});
+
+export const logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
+export const protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  if (!token) {
+    return next(new AppError('You are not logged in! Please log in.', 401));
+  }
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError('The user belonging to this token no longer exists.', 401)
+    );
+  }
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again.', 401)
+    );
+  }
+  if (!currentUser.active) {
+    return next(new AppError('This user is no longer active.', 401));
+  }
+  req.user = currentUser;
+  next();
+});
+
+export const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action.', 403)
+      );
     }
+    next();
   };
 };
 
-export const initEmailClient = () => getEmailClient();
+export const forgotPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return res
+      .status(200)
+      .json({ status: 'success', message: 'Token sent to email.' });
+  }
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+  // --- MODIFICATION 3: Create both text and HTML messages ---
+  const textMessage = `Forgot your password? Copy and paste this link to reset it (valid for 10 minutes):\n\n${resetURL}\n\nIf you didn't forget your password, please ignore this email!`;
+  const htmlMessage = `<p>Forgot your password? Please <a href="${resetURL}">click here to reset your password</a> (the link is valid for 10 minutes).</p><p>If you didn't request this, please ignore this email.</p>`;
+
+  // ✅ --- INITIALIZE THE EMAIL CLIENT HERE ---
+  const sendEmail = req.app.get('emailClient');
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (valid for 10 minutes)',
+      text: textMessage,
+      html: htmlMessage,
+    });
+    res
+      .status(200)
+      .json({ status: 'success', message: 'Token sent to email.' });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new AppError('Error sending the email. Try again later.', 500));
+  }
+});
+
+export const resetPassword = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError('Token is invalid or expired.', 400));
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  createSendToken(user, 200, res);
+});
+
+export const updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  createSendToken(user, 200, res);
+});
