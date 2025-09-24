@@ -9,7 +9,7 @@ export default function NotFoundPage() {
       <p className="text-gray-500 mt-2">
         Sorry, the page you are looking for does not exist.
       </p>
-      <p className="text-gray-500 mt-2 leading-relaxed">
+      <p className="text-gray-500 mt-2">
         Should you need to contact us:{' '}
         <a
           href="mailto:support@tourmygarage.com?subject=Support%20Request&body=Hi%20there,%0D%0A%0D%0AI%20need%20help%20with..."
