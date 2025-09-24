@@ -66,7 +66,7 @@ export const signup = catchAsync(async (req, res, next) => {
   //const verificationURL = `${process.env.BACKEND_API_URL}/api/v1/users/verify-email/${verificationToken}`; OLD
   // --- MODIFICATION 1: Create both text and HTML messages ---
   const textMessage = `Welcome to TourMyGarage.com! Please verify your email address by copying and pasting this link into your browser:\n\n${verificationURL}\n\nIf you did not sign up, please ignore this email.`;
-  const htmlMessage = `<p>Welcome to TourMyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p>`;
+  const htmlMessage = `<p>Welcome to TourMyGarage!</p><p>Please verify your email address by <a href="${verificationURL}">clicking here</a>.</p><p>If you did not sign up, please ignore this email.</p><p>Need help?  Contact us:  support@tourmygarage.com</p>`;
 
   // ✅ --- INITIALIZE THE EMAIL CLIENT HERE ---
   const sendEmail = req.app.get('emailClient');
