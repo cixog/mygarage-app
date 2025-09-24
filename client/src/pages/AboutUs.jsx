@@ -47,7 +47,7 @@ const About = () => {
       <p className="mb-4 text-lg leading-relaxed">
         Should you need to contact us:{' '}
         <a
-          hhref="mailto:support@tourmygarage.com?subject=Support%20Request&body=Hi%20there,%0D%0A%0D%0AI%20need%20help%20with..."
+          href="mailto:support@tourmygarage.com?subject=Support%20Request&body=Hi%20there,%0D%0A%0D%0AI%20need%20help%20with..."
           className="font-semibold text-blue-600 hover:underline"
         >
           Support

@@ -31,6 +31,15 @@ export default function Footer() {
             <p className="mt-2 text-sm text-gray-400">
               A community for showcasing car collections.
             </p>
+            <p className="mb-4 text-lg leading-relaxed">
+              Contact us:{' '}
+              <a
+                href="mailto:support@tourmygarage.com?subject=Support%20Request&body=Hi%20there,%0D%0A%0D%0AI%20need%20help%20with..."
+                className="font-semibold text-blue-600 hover:underline"
+              >
+                Support
+              </a>
+            </p>
           </div>
 
           {/* Column 2: Navigation */}
