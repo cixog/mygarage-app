@@ -45,7 +45,13 @@ const About = () => {
       </p>
 
       <p className="mb-4 text-lg leading-relaxed">
-        Should need to contact us: support@tourmygarage.com
+        Should you need to contact us:{' '}
+        <a
+          href="mailto:support@tourmygarage.com"
+          className="font-semibold text-blue-600 hover:underline"
+        >
+          Support
+        </a>
       </p>
     </div>
   );
