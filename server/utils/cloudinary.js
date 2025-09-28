@@ -1,26 +1,36 @@
-// server/utils/cloudinary.js (This is a NEW file)
+// server/utils/cloudinary.js
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
+import AppError from './AppError.js'; // Import AppError to throw a proper error object
 
-// Make sure environment variables are loaded
 dotenv.config({ path: './config.env' });
 
-// Configure the Cloudinary SDK with your credentials from Render
+// --- MODIFICATION START ---
+// Check if credentials are set before configuring, and throw a proper error if not.
+if (
+  !process.env.CLOUDINARY_CLOUD_NAME ||
+  !process.env.CLOUDINARY_API_KEY ||
+  !process.env.CLOUDINARY_API_SECRET
+) {
+  throw new AppError(
+    'Cloudinary credentials are not set in the environment variables.',
+    500
+  );
+}
+// --- MODIFICATION END ---
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Create a new storage engine for multer that sends files to Cloudinary
 export const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'mygarage', // A folder name in your Cloudinary account
+    folder: 'mygarage',
     allowed_formats: ['jpeg', 'png', 'jpg', 'gif'],
-    // You can add transformations here if you want
-    // transformation: [{ width: 2000, height: 1333, crop: 'limit' }]
   },
 });
 

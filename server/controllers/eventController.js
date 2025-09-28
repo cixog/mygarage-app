@@ -3,7 +3,8 @@ import Event from '../models/eventModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import * as factory from './handlerFactory.js';
-import sendEmail from '../utils/email.js';
+import { initEmailClient } from '../utils/email.js';
+const sendEmail = initEmailClient();
 import APIFeatures from '../utils/apiFeatures.js';
 import geocode from '../utils/geocoder.js';
 
@@ -33,6 +34,7 @@ export const submitEvent = catchAsync(async (req, res, next) => {
     const [longitude, latitude] = await geocode(fullAddressForGeocoding);
     coordinates = [longitude, latitude];
   } catch (err) {
+    console.log(err);
     // It's better to let them submit without coordinates than to fail completely.
     // You can decide if you want to make this a hard requirement.
     console.warn(`Could not geocode address: ${fullAddressForGeocoding}`);
@@ -157,7 +159,7 @@ export const approveEvent = catchAsync(async (req, res, next) => {
       email: event.createdBy.email,
       subject: `Your Event Submission: "${event.title}" has been Approved!`,
       html: `<p>Great news! Your event, "${event.title}", has been approved and is now live on TourMyGarage.</p>
-      <p>Check it out!</p>`,
+      <p>Check it out!</p><p>Question?  Ask our pit crew: <a href="mailto:support@tourmygarage.com">support@tourmygarage.com</a></p>`,
     });
   } catch (err) {
     console.error('Failed to send approval email:', err);

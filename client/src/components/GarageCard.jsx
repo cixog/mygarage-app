@@ -53,15 +53,20 @@ export default function GarageCard({ garage }) {
           {garage.description || 'No description provided.'}
         </p>
 
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-700">
+        {/* Combine count and location into one easily-spaced flex container */}
+        <div className="flex items-center mt-4 text-sm font-semibold text-gray-700">
+          {/* 1. Vehicle Count with Icon (Icon has right margin mr-1) */}
+          <div className="flex items-center">
             <span>{garage.vehicleCount}</span>
-            <img src={carIcon} alt="Vehicles" className="h-5 w-5" />
+            <img src={carIcon} alt="Vehicles" className="h-5 w-5 ml-1" />
           </div>
 
-          {/* --- THIS IS THE FIX --- */}
-          {/* We now safely access the 'address' property of the location object */}
-          <span className="text-xs text-gray-500">
+          {/* 2. Separator */}
+          {/* Use a vertical pipe '|' or a middle dot '·' with horizontal margin (mx-2) */}
+          <span className="mx-2 text-gray-400">|</span>
+
+          {/* 3. Location (Note: Lower text size text-xs is preserved) */}
+          <span className="text-xs text-gray-500 font-normal">
             {garage.user?.location || 'Location not set'}
           </span>
         </div>

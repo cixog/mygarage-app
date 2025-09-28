@@ -43,6 +43,15 @@ const About = () => {
         At TourMyGarage, it’s all about sharing the passion. So come on in, park
         your photos, and cruise around a bit. You’re in good company.
       </p>
+      <p className="mb-4 text-lg leading-relaxed">
+        Should you need to contact us:{' '}
+        <a
+          href="mailto:support@tourmygarage.com?subject=Support%20Request&body=Hi%20there,%0D%0A%0D%0AI%20need%20help%20with..."
+          className="font-semibold text-blue-600 hover:underline"
+        >
+          Support
+        </a>
+      </p>
     </div>
   );
 };

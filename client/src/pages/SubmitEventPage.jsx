@@ -40,17 +40,33 @@ export default function SubmitEventPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // To upload files, we MUST use the FormData object.
-    // It correctly packages text fields and files into a single request.
-    const submissionData = new FormData();
+    // Create a new object for form data where we convert the date strings
+    const eventSubmissionData = {
+      ...formData,
+      // CRITICAL FIX: Convert the YYYY-MM-DD date string into a Date object
+      // that is safe from timezone offset by setting the time to noon (12:00)
+      // in the local time zone where the browser is running.
+      startDate: formData.startDate
+        ? new Date(formData.startDate + 'T12:00:00')
+        : undefined,
+      endDate: formData.endDate
+        ? new Date(formData.endDate + 'T12:00:00')
+        : undefined,
+    };
 
-    // Append each key-value pair from our text form data state.
-    for (const key in formData) {
-      submissionData.append(key, formData[key]);
+    const submissionData = new FormData();
+    // Append all text fields from the modified object
+    for (const key in eventSubmissionData) {
+      // Convert Date objects back to ISO strings, but the 'T12:00:00' ensures
+      // the UTC date is correct.
+      const value =
+        eventSubmissionData[key] instanceof Date
+          ? eventSubmissionData[key].toISOString()
+          : eventSubmissionData[key];
+      submissionData.append(key, value);
     }
 
     // If an image file was selected, append it to the form data.
-    // The key 'photos' MUST match what the backend multer middleware expects.
     if (imageFile) {
       submissionData.append('photos', imageFile);
     }

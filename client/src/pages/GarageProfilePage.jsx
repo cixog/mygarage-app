@@ -161,6 +161,26 @@ export default function GarageProfilePage() {
             <span className="font-semibold">{garageData.user.name}</span>
           </p>
 
+          {/* Check for location and render it clearly below the owner name */}
+          {garageData.user.location && (
+            <p className="text-lg text-gray-500 mt-0.5 flex items-center">
+              {/* Optional Location Pin Icon (Heroicon) */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5 mr-1 text-gray-400"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M11.54 22.351A8.257 8.257 0 0 1 7.5 21.75V15.75H2.25l9.284-9.352a.75.75 0 0 1 1.054 0l9.284 9.352H16.5v5.996a8.257 8.257 0 0 1-4.96-.395ZM15 15.75h4.5a.75.75 0 0 0 .75-.75V11.25a.75.75 0 0 0-.75-.75h-4.5v5.25ZM9 15.75h4.5v5.25H9v-5.25Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {garageData.user.location}
+            </p>
+          )}
+
           {/* We add the new `joinDate` variable to this metadata section. */}
           <div className="flex justify-center md:justify-start items-center gap-x-3 text-sm text-gray-500 mt-2">
             <span>
