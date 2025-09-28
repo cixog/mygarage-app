@@ -158,7 +158,7 @@ export const approveEvent = catchAsync(async (req, res, next) => {
       email: event.createdBy.email,
       subject: `Your Event Submission: "${event.title}" has been Approved!`,
       html: `<p>Great news! Your event, "${event.title}", has been approved and is now live on TourMyGarage.</p>
-      <p>Check it out!</p>`,
+      <p>Check it out!</p><p>Question?  Ask our pit crew: <a href="mailto:support@tourmygarage.com">support@tourmygarage.com</a></p>`,
     });
   } catch (err) {
     console.error('Failed to send approval email:', err);
