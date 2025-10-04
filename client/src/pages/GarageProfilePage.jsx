@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -124,6 +125,23 @@ export default function GarageProfilePage() {
       <p className="text-center text-red-500 p-10">Garage data is missing.</p>
     );
 
+  // --- PREPARE SEO CONTENT (STEP 2) ---
+  const garageName = garageData.name;
+  const ownerName = garageData.user.name;
+
+  // Create a clean description, using the first 150 chars of the garage description
+  const descriptionSnippet = garageData.description
+    ? garageData.description.substring(0, 150)
+    : `See the custom vehicle collection owned by ${ownerName} on MyGarage.`;
+
+  // Dynamic Page Title
+  const pageTitle = `${garageName} | ${ownerName}'s Custom Garage`;
+
+  // Dynamic Meta Description
+  const pageDescription = descriptionSnippet;
+
+  // --- END PREPARE SEO CONTENT ---
+
   const avatarUrl = garageData.user.avatar?.startsWith('http')
     ? garageData.user.avatar
     : `${import.meta.env.VITE_STATIC_FILES_URL}/img/users/${
@@ -146,6 +164,23 @@ export default function GarageProfilePage() {
 
   return (
     <div className="max-w-6xl mx-auto p-4">
+      {/* 💡 STEP 3: Insert the Helmet component at the top of the return block */}
+
+      <Helmet>
+        <title>{pageTitle}</title>
+
+        <meta name="description" content={pageDescription} />
+
+        {/* Optional: Open Graph tags for social media previews */}
+
+        <meta property="og:title" content={pageTitle} />
+
+        <meta property="og:description" content={pageDescription} />
+
+        {/* Set the canonical URL */}
+
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 p-6 bg-white rounded-lg shadow-md">
         <img
           src={avatarUrl}

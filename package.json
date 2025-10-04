@@ -16,7 +16,8 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "concurrently": "^9.2.0",
-    "react-error-boundary": "^6.0.0"
+    "react-error-boundary": "^6.0.0",
+    "react-helmet-async": "^2.0.5"
   },
   "devDependencies": {
     "postcss": "^8.4.38"

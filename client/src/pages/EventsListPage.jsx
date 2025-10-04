@@ -1,6 +1,7 @@
 // client/src/pages/EventsListPage.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -91,104 +92,116 @@ export default function EventsListPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header section (Unchanged) */}
-      <div className="flex justify-between items-center mb-6 pb-2 border-b">
-        <h1 className="text-4xl font-bold">Upcoming Events</h1>
-        {user && (
-          <button
-            onClick={() => navigate('/events/submit')}
-            className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition"
+    // ✍️ 2. WRAP CONTENT IN A REACT FRAGMENT
+    <>
+      <Helmet>
+        <title>Upcoming Automotive Events & Car Shows | MyGarage</title>
+        <meta
+          name="description"
+          content="View a calendar of upcoming car meets, track days, auto shows, and enthusiast gatherings submitted by the MyGarage community. Find your next event!"
+        />
+        {/* Canonical Link */}
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      <div className="max-w-4xl mx-auto">
+        {/* Header section */}
+        <div className="flex justify-between items-center mb-6 pb-2 border-b">
+          <h1 className="text-4xl font-bold">Upcoming Events</h1>
+          {user && (
+            <button
+              onClick={() => navigate('/events/submit')}
+              className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition"
+            >
+              + Submit an Event
+            </button>
+          )}
+        </div>
+
+        {/* --- 4. NEW: FILTER AND SEARCH UI --- */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search by event name..."
+            value={filters.search}
+            onChange={handleFilterChange}
+            className="w-full sm:w-2/3 border rounded px-3 py-2"
+          />
+          <select
+            name="category"
+            value={filters.category}
+            onChange={handleFilterChange}
+            className="w-full sm:w-1/3 border rounded px-3 py-2 bg-white"
           >
-            + Submit an Event
-          </button>
+            <option value="">All Categories</option>
+            <option value="Car/Truck/Bike Show">Car/Truck/Bike Show</option>
+            <option value="Cars & Coffee">Cars & Coffee</option>
+            <option value="Track Day">Track Day</option>
+            <option value="Concours">Concours</option>
+            <option value="Auction">Auction</option>
+            <option value="Club Meetup">Club Meetup</option>
+            <option value="Museum Exhibit">Museum Exhibit</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* --- MODIFIED DISPLAY LOGIC --- */}
+        {loading ? (
+          <p className="text-center p-10">Loading events...</p>
+        ) : events.length > 0 ? (
+          <div className="bg-white rounded-lg shadow-md border">
+            {events.map(event => {
+              // Helper to create the map link
+              const mapQuery = encodeURIComponent(
+                `${event.location?.address || ''} ${
+                  event.location?.city || ''
+                }, ${event.location?.state || ''}`
+              );
+              const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+              return (
+                <Link
+                  key={event._id}
+                  to={`/events/${event._id}`}
+                  // Use flexbox for the three-column layout
+                  className="flex items-center px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
+                >
+                  {/* Column 1: Dates (Fixed Width) */}
+                  <div className="w-28 flex-shrink-0 font-semibold text-sm text-blue-600 text-left">
+                    {formatDateRange(event.startDate, event.endDate)}
+                  </div>
+
+                  {/* Column 2: Event Title (Flexible Width) */}
+                  <div className="flex-grow px-4 font-medium text-gray-800 text-left">
+                    {event.title}
+                  </div>
+
+                  {/* Column 3: Location (Right-aligned) */}
+                  <div className="flex-shrink-0 text-sm text-gray-500 text-right">
+                    {event.location?.city && event.location?.state ? (
+                      <a
+                        href={mapLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()} // Prevents the Link navigation
+                        className="hover:underline hover:text-blue-600"
+                      >
+                        {event.location.city}, {event.location.state}
+                      </a>
+                    ) : (
+                      <span>Location TBD</span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-10">
+            No events found that match your criteria.
+          </p>
         )}
       </div>
-
-      {/* --- 4. NEW: FILTER AND SEARCH UI --- */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
-        <input
-          type="text"
-          name="search"
-          placeholder="Search by event name..."
-          value={filters.search}
-          onChange={handleFilterChange}
-          className="w-full sm:w-2/3 border rounded px-3 py-2"
-        />
-        <select
-          name="category"
-          value={filters.category}
-          onChange={handleFilterChange}
-          className="w-full sm:w-1/3 border rounded px-3 py-2 bg-white"
-        >
-          <option value="">All Categories</option>
-          <option value="Car/Truck/Bike Show">Car/Truck/Bike Show</option>
-          <option value="Cars & Coffee">Cars & Coffee</option>
-          <option value="Track Day">Track Day</option>
-          <option value="Concours">Concours</option>
-          <option value="Auction">Auction</option>
-          <option value="Club Meetup">Club Meetup</option>
-          <option value="Museum Exhibit">Museum Exhibit</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      {/* --- MODIFIED DISPLAY LOGIC --- */}
-      {loading ? (
-        <p className="text-center p-10">Loading events...</p>
-      ) : events.length > 0 ? (
-        <div className="bg-white rounded-lg shadow-md border">
-          {events.map(event => {
-            // Helper to create the map link
-            const mapQuery = encodeURIComponent(
-              `${event.location?.address || ''} ${
-                event.location?.city || ''
-              }, ${event.location?.state || ''}`
-            );
-            const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
-
-            return (
-              <Link
-                key={event._id}
-                to={`/events/${event._id}`}
-                // Use flexbox for the three-column layout
-                className="flex items-center px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
-              >
-                {/* Column 1: Dates (Fixed Width) */}
-                <div className="w-28 flex-shrink-0 font-semibold text-sm text-blue-600 text-left">
-                  {formatDateRange(event.startDate, event.endDate)}
-                </div>
-
-                {/* Column 2: Event Title (Flexible Width) */}
-                <div className="flex-grow px-4 font-medium text-gray-800 text-left">
-                  {event.title}
-                </div>
-
-                {/* Column 3: Location (Right-aligned) */}
-                <div className="flex-shrink-0 text-sm text-gray-500 text-right">
-                  {event.location?.city && event.location?.state ? (
-                    <a
-                      href={mapLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={e => e.stopPropagation()} // Prevents the Link navigation
-                      className="hover:underline hover:text-blue-600"
-                    >
-                      {event.location.city}, {event.location.state}
-                    </a>
-                  ) : (
-                    <span>Location TBD</span>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        <p className="text-center text-gray-500 py-10">
-          No events found that match your criteria.
-        </p>
-      )}
-    </div>
+    </>
   );
 }

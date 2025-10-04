@@ -1,5 +1,6 @@
 // client/src/pages/ToolBox.jsx
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 
@@ -37,78 +38,105 @@ export default function ToolBox() {
   };
 
   return (
-    <div className="max-w-lg mx-auto py-12 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold text-center mb-2">Tool Box</h1>
-      <p className="text-lg text-gray-600 mt-2 text-left mb-1">
-        Have a question or need to report an issue? Let us know!
-      </p>
-      <p className="text-lg text-gray-600 mt-1 text-left mb-8">
-        (Just remember, we're a small pit crew.)
-      </p>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="category" className="block font-medium text-gray-700">
-            Will you ballpark this?
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2 mt-1 bg-white"
+    <>
+      <Helmet>
+        <title>Tool Box | TourMyGarage</title>
+        <meta
+          name="description"
+          content="Use the TourMyGarage Tool Box to ask questions, report bugs, or suggest new features. Connect with our pit crew for support and feedback."
+        />
+        <link rel="canonical" href={window.location.href} />
+
+        {/* Optional: Social sharing metadata */}
+        <meta property="og:title" content="Tool Box | TourMyGarage" />
+        <meta
+          property="og:description"
+          content="Ask questions, report bugs, and suggest features in the TourMyGarage Tool Box."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content="/some-social-preview.jpg" />
+      </Helmet>
+
+      <div className="max-w-lg mx-auto py-12 p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold text-center mb-2">Tool Box</h1>
+        <p className="text-lg text-gray-600 mt-2 text-left mb-1">
+          Have a question or need to report an issue? Let us know!
+        </p>
+        <p className="text-lg text-gray-600 mt-1 text-left mb-8">
+          (Just remember, we're a small pit crew.)
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="category"
+              className="block font-medium text-gray-700"
+            >
+              Will you ballpark this?
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              className="w-full border rounded px-3 py-2 mt-1 bg-white"
+            >
+              <option value="" disabled>
+                -- Please select a category --
+              </option>
+              <option value="General Question">General Question</option>
+              <option value="Bug Report">Bug Report</option>
+              <option value="Feature Suggestion">Feature Suggestion</option>
+              <option value="User Report">Report a User or Garage</option>
+              <option value="Account Issue">Account Issue</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="subject"
+              className="block font-medium text-gray-700"
+            >
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              required
+              className="w-full border rounded px-3 py-2 mt-1"
+              placeholder="A brief summary of your request"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="description"
+              className="block font-medium text-gray-700"
+            >
+              Details
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="6"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              className="w-full border rounded px-3 py-2 mt-1"
+              placeholder="What's going on?"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:bg-gray-400"
           >
-            <option value="" disabled>
-              -- Please select a category --
-            </option>
-            <option value="General Question">General Question</option>
-            <option value="Bug Report">Bug Report</option>
-            <option value="Feature Suggestion">Feature Suggestion</option>
-            <option value="User Report">Report a User or Garage</option>
-            <option value="Account Issue">Account Issue</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="subject" className="block font-medium text-gray-700">
-            Subject
-          </label>
-          <input
-            type="text"
-            id="subject"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2 mt-1"
-            placeholder="A brief summary of your request"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="description"
-            className="block font-medium text-gray-700"
-          >
-            Details
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            rows="6"
-            value={formData.description}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2 mt-1"
-            placeholder="What's going on?"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:bg-gray-400"
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit Request'}
-        </button>
-      </form>
-    </div>
+            {isSubmitting ? 'Submitting...' : 'Submit Request'}
+          </button>
+        </form>
+      </div>
+    </>
   );
 }

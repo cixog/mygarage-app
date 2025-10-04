@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -104,6 +105,7 @@ export default function VehiclePage() {
     try {
       await api.patch(`/vehicles/${vehicleId}/like`);
     } catch (err) {
+      console.log(err);
       toast.error('Failed to update like status.');
       setIsLiked(originalIsLiked);
       setLikeCount(prev => (originalIsLiked ? prev + 1 : prev - 1));
@@ -122,6 +124,7 @@ export default function VehiclePage() {
       setNewComment('');
       toast.success('Comment posted!');
     } catch (err) {
+      console.log(err);
       toast.error('Failed to post comment.');
     } finally {
       setIsSubmittingComment(false);
@@ -139,6 +142,7 @@ export default function VehiclePage() {
       toast.success('Cover photo updated!');
       fetchPageData();
     } catch (err) {
+      console.log(err);
       setVehicle(prev => ({ ...prev, coverPhoto: originalCover }));
       toast.error('Failed to update cover photo.');
     }
@@ -151,6 +155,7 @@ export default function VehiclePage() {
       toast.success('Photo deleted successfully!');
       fetchPageData();
     } catch (err) {
+      console.log(err);
       toast.error('Failed to delete photo.');
     }
   };
@@ -164,6 +169,20 @@ export default function VehiclePage() {
   // ✅ THIS IS THE FIX: isOwner and coverPhotoUrl are now calculated *after* the guards.
   const isOwner = loggedInUser && loggedInUser._id === vehicle.user;
 
+  // --- PREPARE SEO CONTENT (STEP 2) ---
+  const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  // Prioritize the owner's story, then the description for a rich snippet
+  // Note: We use the story, as it's the more compelling, unique content.
+  const contentSnippet = vehicle.story || vehicle.description || '';
+  const maxDescLength = 160;
+  // Dynamic Page Title: Highly specific (e.g., "1969 Ford Mustang | Custom Build on MyGarage")
+  const pageTitle = `${vehicleName} | Custom Build on MyGarage`;
+  // Dynamic Meta Description: Truncates the story/description to the optimal SEO length
+  const pageDescription =
+    contentSnippet.substring(0, maxDescLength).trim() +
+    (contentSnippet.length > maxDescLength ? '...' : '');
+
+  // --- END PREPARE SEO CONTENT ---
   const coverPhotoUrl = vehicle.coverPhoto?.startsWith('http')
     ? vehicle.coverPhoto
     : `${import.meta.env.VITE_STATIC_FILES_URL}/img/photos/${
@@ -172,6 +191,16 @@ export default function VehiclePage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-8">
+      {/* 💡 STEP 3: Insert the Helmet component at the top of the return block */}
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        {/* Optional: Open Graph tags for social media previews */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {/* Set the canonical URL */}
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
       <div className="w-full aspect-video bg-gray-900 rounded-lg shadow-lg overflow-hidden">
         <img
           src={coverPhotoUrl}
