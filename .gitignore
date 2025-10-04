@@ -17,6 +17,7 @@ npm-debug.log*
 .env
 /server/config.env
 /client/.env
+.env.development
 
 # IDE and OS files
 .vscode/

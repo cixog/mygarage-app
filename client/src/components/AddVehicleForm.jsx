@@ -9,6 +9,8 @@ export default function AddVehicleForm({ onVehicleAdded }) {
     model: '',
     year: '',
     description: '',
+    mileage: '',
+    fuelType: '',
   });
   // --- NEW: State for the photo files ---
   const [photos, setPhotos] = useState([]);
@@ -44,6 +46,8 @@ export default function AddVehicleForm({ onVehicleAdded }) {
     submissionData.append('model', formData.model);
     submissionData.append('year', formData.year);
     submissionData.append('description', formData.description);
+    submissionData.append('mileage', formData.mileage);
+    submissionData.append('fuelType', formData.fuelType);
 
     // Append each photo file
     photos.forEach(photo => {
@@ -102,6 +106,19 @@ export default function AddVehicleForm({ onVehicleAdded }) {
         required
         className="w-full border rounded px-3 py-2"
       />
+      <select
+        name="fuelType"
+        value={formData.fuelType}
+        onChange={handleChange}
+        className="w-full border rounded px-3 py-2 bg-white"
+      >
+        <option value="">Select Fuel Type</option>
+        <option value="Gasoline">Gasoline</option>
+        <option value="Diesel">Diesel</option>
+        <option value="Electric">Electric</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="Other">Other</option>
+      </select>
       <textarea
         name="description"
         placeholder="A short description of the vehicle..."

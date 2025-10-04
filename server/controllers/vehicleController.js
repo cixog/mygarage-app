@@ -27,6 +27,8 @@ export const createVehicle = catchAsync(async (req, res, next) => {
     model: req.body.model,
     year: req.body.year,
     description: req.body.description,
+    mileage: req.body.mileage, // Add this line
+    fuelType: req.body.fuelType,
     user: req.user.id,
     garage: garage._id,
   };

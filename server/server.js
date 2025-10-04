@@ -1,6 +1,12 @@
-// server/server.js (Correct and Final Version)
+// server/server.js
+
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import app from './app.js';
+import { initEmailClient } from './utils/email.js';
+
+// Initialize the email client once at application startup.
+// This sets the email client based on the NODE_ENV.
+const sendEmail = initEmailClient();
 
 // Handle any uncaught exceptions at the very top
 process.on('uncaughtException', err => {
@@ -9,24 +15,15 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-// Load environment variables from config.env
-dotenv.config({ path: './config.env' });
+console.log('Final NODE_ENV:', process.env.NODE_ENV);
 
-// --- THIS IS THE KEY IMPORT ---
-// This file correctly imports `app.js` using a relative path.
-// It does NOT import any controllers.
-import app from './app.js';
-
-// Get the database connection string from the environment
 const DB = process.env.DATABASE;
 
-// Check if the DATABASE variable exists
 if (!DB) {
   console.error('FATAL ERROR: DATABASE environment variable not found!');
-  process.exit(1); // Stop the server if the connection string is missing
+  process.exit(1);
 }
 
-// Connect to MongoDB and log the result for diagnostics
 mongoose
   .connect(DB)
   .then(conn => {
@@ -38,13 +35,11 @@ mongoose
     console.error('❌ DB Connection Error:', err.message);
   });
 
-// Start the Express server
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
 
-// Handle any unhandled promise rejections (like a bad DB password)
 process.on('unhandledRejection', err => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
   console.log(err.name, err.message);
@@ -52,3 +47,8 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+// We need to export this, but server.js is the entry point, so we can't directly export.
+// A cleaner way is to store it and retrieve it from another file, but for a quick fix, let's pass it.
+// This approach is not ideal, but it's a minimal change to get your app working.
+app.set('emailClient', sendEmail);

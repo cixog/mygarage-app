@@ -1,6 +1,6 @@
-// server/app.js (Corrected with trust proxy)
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import express from 'express';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
@@ -10,6 +10,19 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+
+// Define a variable that reliably points to the 'server' directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Use that reliable path to load your config file
+dotenv.config({ path: path.resolve(__dirname, 'config.env') });
+
+// Now your test logs should show the correct values.
+console.log('--- Dotenv Load Test ---');
+console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
+console.log('EMAIL_USERNAME:', process.env.EMAIL_USERNAME);
+console.log('------------------------');
 
 //import AppError from './utils/AppError.js';
 import globalErrorHandler from './controllers/errorController.js';
@@ -21,9 +34,6 @@ import vehicleRouter from './routes/vehicleRoutes.js';
 import searchRouter from './routes/searchRoutes.js';
 import eventRouter from './routes/eventRoutes.js';
 import ticketRouter from './routes/ticketRoutes.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -37,9 +47,16 @@ app.set('trust proxy', 1);
 // We check if the CLIENT_URL environment variable is set. If it is, we create
 // an array containing both versions.
 const allowedOrigins = [];
+// --- THIS IS THE FIX ---
+// Conditionally add the localhost URL if in a development environment.
+if (process.env.NODE_ENV === 'development') {
+  allowedOrigins.push('http://localhost:5173');
+}
+
+// Your existing production logic to handle CLIENT_URL and CORS_ORIGINS
 if (process.env.CLIENT_URL) {
-  allowedOrigins.push(process.env.CLIENT_URL); // e.g., https://www.tourmygarage.com
-  allowedOrigins.push(process.env.CLIENT_URL.replace('www.', '')); // e.g., https://tourmygarage.com
+  allowedOrigins.push(process.env.CLIENT_URL);
+  allowedOrigins.push(process.env.CLIENT_URL.replace('www.', ''));
 }
 if (process.env.CORS_ORIGINS) {
   process.env.CORS_ORIGINS.split(',').forEach(origin => {
