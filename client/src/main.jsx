@@ -2,7 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
+import Helmet from 'react-helmet';
 import App from './App.jsx';
 import './index.css';
 import 'mapbox-gl/dist/mapbox-gl.css';

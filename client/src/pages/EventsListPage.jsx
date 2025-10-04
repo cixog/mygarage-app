@@ -1,7 +1,7 @@
 // client/src/pages/EventsListPage.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Helmet from 'react-helmet';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 

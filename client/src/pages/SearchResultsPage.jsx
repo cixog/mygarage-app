@@ -1,7 +1,7 @@
 // client/src/pages/SearchResultsPage.jsx
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Helmet from 'react-helmet';
 import api from '../api/api';
 import GarageCard from '../components/GarageCard'; // Reuse your excellent component!
 import GarageCardSkeleton from '../components/GarageCardSkeleton'; // For loading state

@@ -1,7 +1,7 @@
 // client/src/pages/AllGarages.jsx (Further modifications)
 
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Helmet from 'react-helmet';
 import api from '../api/api';
 import GarageCard from '../components/GarageCard';
 import GarageCardSkeleton from '../components/GarageCardSkeleton';

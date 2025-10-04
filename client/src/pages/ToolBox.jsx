@@ -1,6 +1,6 @@
 // client/src/pages/ToolBox.jsx
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Helmet from 'react-helmet';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 
