@@ -14,9 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     {/* 2. Wrap your entire App component with the AuthProvider */}
     <AuthProvider>
       {/* 3. Wrap your App component with the HelmetProvider */}
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
+      <App />
     </AuthProvider>
   </React.StrictMode>
 );
