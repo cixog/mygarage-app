@@ -113,7 +113,16 @@ export const getAllPublicEvents = catchAsync(async (req, res, next) => {
 });
 
 // FOR PUBLIC: Get details of a single approved event (Unchanged)
-export const getPublicEvent = factory.getOne(Event);
+// ✅ MODIFICATION: Update the factory call to populate the creator and their garage.
+export const getPublicEvent = factory.getOne(Event, {
+  path: 'createdBy',
+  select: 'name email garage',
+  // Nest the population to get the garage details as well.
+  populate: {
+    path: 'garage',
+    select: 'name',
+  },
+});
 
 // --- ADMIN FUNCTIONS (All Unchanged) ---
 

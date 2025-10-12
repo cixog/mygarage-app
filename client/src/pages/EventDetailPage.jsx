@@ -1,7 +1,7 @@
 // client/src/pages/EventDetailPage.jsx
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import Helmet from 'react-helmet';
+import { Link, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/api';
 
 export default function EventDetailPage() {
@@ -37,6 +37,12 @@ export default function EventDetailPage() {
   if (loading) return <p className="text-center p-10">Loading Event...</p>;
   if (error) return <p className="text-center text-red-500 p-10">{error}</p>;
   if (!event) return null;
+
+  // ✍️ 1. NEW: Safely extract the creator's garage name
+  const creatorGarageName = event.createdBy?.garage?.name;
+  const creatorProfileLink = event.createdBy
+    ? `/profile/${event.createdBy._id}`
+    : '#';
 
   // ✍️ 2. DEFINE DYNAMIC METADATA VARIABLES HERE
   // This executes only after 'event' is successfully loaded.
@@ -79,6 +85,20 @@ export default function EventDetailPage() {
 
         {/* --- Rest of the component is unchanged --- */}
         <h1 className="text-4xl font-bold text-gray-800 mb-2">{event.title}</h1>
+
+        {/* ✍️ 3. NEW: Acknowledgment block. Placed before the main event details div */}
+        {creatorGarageName && (
+          <div className="text-right text-sm text-gray-500 mb-4">
+            Thanks to:{' '}
+            <Link
+              to={creatorProfileLink}
+              className="font-semibold text-blue-600 hover:underline"
+            >
+              {creatorGarageName}
+            </Link>
+          </div>
+        )}
+
         <div className="text-lg text-gray-600 mb-4 border-b pb-4">
           <p>
             <strong>When:</strong>{' '}
