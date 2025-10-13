@@ -157,8 +157,7 @@ export default function EventsListPage() {
                   event.location?.city || ''
                 }, ${event.location?.state || ''}`
               );
-              // NOTE: Fixed the template literal issue. The '1' should be outside the mapQuery variable.
-              const mapLink = `http://googleusercontent.com/maps.google.com/?q=${mapQuery}`;
+              const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
 
               return (
                 <Link
@@ -180,18 +179,15 @@ export default function EventsListPage() {
                   {/* Column 3: Location (Right-aligned) */}
                   <div className="flex-shrink-0 text-sm text-gray-500 text-right">
                     {event.location?.city && event.location?.state ? (
-                      <span // ⬅️ CRITICAL FIX: Changed from <a> to <span>
-                        onClick={e => {
-                          e.stopPropagation(); // 1. Prevents the click from triggering the parent <Link>
-                          e.preventDefault(); // 2. Prevents any default action of the span (for safety)
-                          // 3. Manually open the link in a new tab
-                          window.open(mapLink, '_blank', 'noopener noreferrer');
-                        }}
-                        // Apply link-like styling to the span
-                        className="hover:underline hover:text-blue-600 cursor-pointer"
+                      <a
+                        href={mapLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()} // Prevents the Link navigation
+                        className="hover:underline hover:text-blue-600"
                       >
                         {event.location.city}, {event.location.state}
-                      </span>
+                      </a>
                     ) : (
                       <span>Location TBD</span>
                     )}
