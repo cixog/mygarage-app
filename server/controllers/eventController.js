@@ -113,7 +113,14 @@ export const getAllPublicEvents = catchAsync(async (req, res, next) => {
 });
 
 // FOR PUBLIC: Get details of a single approved event (Unchanged)
-export const getPublicEvent = factory.getOne(Event);
+export const getPublicEvent = factory.getOne(Event, {
+  path: 'createdBy', // Populate the 'createdBy' field (which is a User ID)
+  select: 'garage', // We only need the 'garage' field from the User
+  populate: {
+    path: 'garage', // Now populate the 'garage' field found inside the User
+    select: 'name', // Only get the 'name' field from the Garage
+  },
+});
 
 // --- ADMIN FUNCTIONS (All Unchanged) ---
 

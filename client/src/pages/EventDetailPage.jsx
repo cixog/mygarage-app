@@ -47,6 +47,8 @@ export default function EventDetailPage() {
     event.shortDescription ||
     `Details and registration information for the automotive event: ${event.title}`;
 
+  const garageName = event.createdBy?.garage?.name;
+
   return (
     // ✍️ 3. WRAP CONTENT IN FRAGMENT AND ADD HELMET
     <>
@@ -107,6 +109,13 @@ export default function EventDetailPage() {
               'Not specified'
             )}
           </p>
+          {/* ✅ NEW: Attribution line */}
+          {garageName && (
+            <p className="text-sm text-gray-500 mt-2 text-right">
+              Thanks for submitting:{' '}
+              <span className="font-semibold">{garageName}</span>
+            </p>
+          )}
         </div>
         <div className="prose max-w-none mt-6">
           <p className="font-semibold">{event.shortDescription}</p>
