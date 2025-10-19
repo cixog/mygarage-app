@@ -69,12 +69,26 @@ export default function EventDetailPage() {
         {/* --- 1. NEW: Conditionally render the event image --- */}
         {/* This block will only appear if the event document has an 'image' property. */}
         {event.image && (
-          <div className="w-full aspect-video bg-gray-200 rounded-lg shadow-md overflow-hidden mb-6">
+          <div
+            className="w-full rounded-lg shadow-md mb-6"
+            style={{
+              // ✍️ 1. Set a fixed maximum height for the container
+              maxHeight: '400px',
+              // ✍️ 2. Enable vertical scrolling when content exceeds max height
+              overflowY: 'scroll',
+              // ✍️ 3. Hide any unwanted horizontal scrollbar
+              overflowX: 'hidden',
+            }}
+          >
             <img
-              // ✅ THIS IS THE FIX: Use the 'image' property directly.
               src={event.image}
               alt={`Promotional image for ${event.title}`}
-              className="w-full h-full object-cover"
+              // ✍️ 4. Ensure image scales to 100% width, but keeps its full, natural height
+              className="w-full"
+              style={{
+                height: 'auto', // Important: Allows image to display full height
+                display: 'block',
+              }}
             />
           </div>
         )}
