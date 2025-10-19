@@ -77,6 +77,7 @@ const eventSchema = new mongoose.Schema(
       enum: [
         'Car/Truck/Bike Show',
         'Cars & Coffee',
+        'Rally',
         'Track Day',
         'Concours',
         'Auction',

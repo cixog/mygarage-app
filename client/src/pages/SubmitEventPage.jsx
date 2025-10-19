@@ -182,6 +182,7 @@ export default function SubmitEventPage() {
             </option>
             <option value="Car/Truck/Bike Show">Car/Truck/Bike Show</option>
             <option value="Cars & Coffee">Cars & Coffee</option>
+            <option value="Rally">Rally</option>
             <option value="Track Day">Track Day</option>
             <option value="Concours">Concours</option>
             <option value="Auction">Auction</option>
