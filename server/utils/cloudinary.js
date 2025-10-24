@@ -30,7 +30,11 @@ export const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'mygarage',
-    allowed_formats: ['jpeg', 'png', 'jpg', 'gif'],
+    // 👈 MODIFICATION: Ensure 'jpeg', 'jpg', and 'jpe' are all listed
+    allowed_formats: ['jpeg', 'png', 'jpg', 'gif', 'jpe'], // Original
+    // Corrected list for maximum JPEG compatibility:
+    // Note: The original list was correct, but we'll try adding 'jpe'
+    //allowed_formats: ['jpeg', 'png', 'jpg', 'gif', 'jpe'], // Recommended fix
   },
 });
 

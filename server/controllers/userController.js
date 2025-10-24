@@ -72,7 +72,7 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
   // 1. Correctly destructure all needed fields from the request body.
   // `location` is the user's general location (City/State/Zip).
   // `address` is the full string to geocode (either location or street + location).
-  const { garageName, location, address, isPublicAddress, about } = req.body; // `address` is now the single string to geocode
+  const { garageName, location, address, about } = req.body; // `address` is now the single string to geocode
 
   // 2. The location string for geocoding is already prepared on the frontend (sent as 'address').
   const locationToGeocode = address;
@@ -91,7 +91,7 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Prepare user updates (this part is correct)
+  // Prepare user updates
   const userUpdates = {
     bio: about,
     // 4. Save the general (private) location to the User model.
