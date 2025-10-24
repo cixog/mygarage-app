@@ -1,4 +1,4 @@
-// client/src/pages/Onboarding.jsx (Corrected)
+// client/src/pages/Onboarding.jsx (Simplified Location Input)
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,16 +8,15 @@ import toast from 'react-hot-toast';
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  // --- THIS IS THE FIX ---
-  // We need to get 'setUser' from the context, not 'refreshUser'.
   const { setUser } = useAuth();
 
   const [formData, setFormData] = useState({
     garageName: '',
+    // 👈 CHANGE 1: Use 'location' to hold the *single* user input (City, State, or Full Address)
     location: '',
-    address: '', // <-- NEW: for the street address
+    about: '',
   });
-  const [isPublicAddress, setIsPublicAddress] = useState(false);
+  // ❌ Removed: isPublicAddress, fullStreetAddress
   const [avatarFile, setAvatarFile] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,16 +35,27 @@ export default function Onboarding() {
     setError('');
     setIsSubmitting(true);
 
-    const submissionData = new FormData();
-    submissionData.append('garageName', formData.garageName);
-    submissionData.append('location', formData.location);
-    submissionData.append('isPublicAddress', isPublicAddress);
-    if (avatarFile) {
-      submissionData.append('avatar', avatarFile);
+    // --- VALIDATION ---
+    // Only check for the simplified 'location' input
+    if (!formData.garageName || !formData.location || !formData.about) {
+      setError('Garage Name, Location, and a description are required.');
+      setIsSubmitting(false);
+      return;
     }
 
-    if (isPublicAddress) {
-      submissionData.append('address', formData.address);
+    // --- BUILD FORM DATA ---
+    const submissionData = new FormData();
+    submissionData.append('garageName', formData.garageName);
+    submissionData.append('about', formData.about);
+
+    // 👈 CRITICAL: The *single* input is sent as BOTH 'location' (for user model) and 'address' (for geocoding)
+    submissionData.append('location', formData.location);
+    submissionData.append('address', formData.location); // Use the same string for geocoding
+
+    // ❌ Removed: isPublicAddress conditional logic
+
+    if (avatarFile) {
+      submissionData.append('avatar', avatarFile);
     }
 
     try {
@@ -57,15 +67,9 @@ export default function Onboarding() {
       const updatedUser = res.data.data.user;
       setUser(updatedUser);
 
-      // --- THIS IS THE FIX ---
-      // Check if `updatedUser.garage` is an object or just an ID string.
-      // This makes our code resilient to what the backend sends.
       const newGarageId = updatedUser.garage._id || updatedUser.garage;
-
-      // Now, newGarageId will ALWAYS have a valid ID.
       navigate(`/garages/${newGarageId}`, { state: { isNewUser: true } });
     } catch (err) {
-      // This catch block will no longer be triggered by our data shape issue.
       const msg =
         err.response?.data?.message || 'Setup failed. Please try again.';
       setError(msg);
@@ -83,7 +87,6 @@ export default function Onboarding() {
       </p>
       {error && <p className="text-red-600 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* All your form inputs are correct and do not need to be changed. */}
         <input
           type="text"
           name="garageName"
@@ -93,40 +96,21 @@ export default function Onboarding() {
           required
           className="w-full border rounded px-3 py-2"
         />
+        {/* 👈 MODIFIED: Single Location Input with Privacy Note */}
         <input
           type="text"
           name="location"
-          placeholder="City, State, or Zip Code" // <-- Updated placeholder
+          placeholder="Location (e.g., Austin, TX or 123 Main St, Anytown, US)"
           value={formData.location}
           onChange={handleChange}
           required
           className="w-full border rounded px-3 py-2"
         />
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="isPublicAddress"
-            checked={isPublicAddress}
-            onChange={e => setIsPublicAddress(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label htmlFor="isPublicAddress" className="text-sm text-gray-700">
-            This is a public business address
-          </label>
-        </div>
-
-        {/* --- The Conditional Address Field --- */}
-        {isPublicAddress && (
-          <input
-            type="text"
-            name="address"
-            placeholder="Street Address (e.g., 123 Main St)"
-            value={formData.address}
-            onChange={handleChange}
-            required // Only required if the checkbox is ticked
-            className="w-full border rounded px-3 py-2"
-          />
-        )}
+        <p className="text-xs text-gray-500 mt-1">
+          Tip: Only include the level of detail you want public (e.g., City,
+          State, or Full Address).
+        </p>
+        {/* ❌ Removed: isPublicAddress checkbox and conditional street address */}
         <textarea
           name="about"
           placeholder="Tell the story behind your collection..."

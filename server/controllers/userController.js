@@ -70,17 +70,16 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
   }
 
   // 1. Correctly destructure all needed fields from the request body.
-  const { garageName, location, address, isPublicAddress, about } = req.body;
+  // `location` is the user's general location (City/State/Zip).
+  // `address` is the full string to geocode (either location or street + location).
+  const { garageName, location, address, isPublicAddress, about } = req.body; // `address` is now the single string to geocode
 
-  // 2. Use the combined location string for geocoding to get the best coordinates.
-  const locationToGeocode =
-    isPublicAddress === 'true' && address
-      ? `${address}, ${location}`
-      : location;
+  // 2. The location string for geocoding is already prepared on the frontend (sent as 'address').
+  const locationToGeocode = address;
 
   let coordinates;
   try {
-    // 3. Pass the correct variable to the geocode function.
+    // 3. Geocode the most specific address we have
     const [longitude, latitude] = await geocode(locationToGeocode);
     coordinates = [longitude, latitude];
   } catch (err) {
@@ -95,17 +94,19 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
   // Prepare user updates (this part is correct)
   const userUpdates = {
     bio: about,
-    location: location, // The user's profile location is always the general one
+    // 4. Save the general (private) location to the User model.
+    location: location,
   };
   if (req.file) {
     userUpdates.avatar = req.file.path;
   }
 
-  // 4. Build the garage's specific location object.
+  // 5. Build the garage's specific location object.
   const garageLocationObject = {
     type: 'Point',
     coordinates: coordinates,
-    address: locationToGeocode, // The garage's address is the most specific one we have
+    // 6. Save the FULL geocoded string (which includes the street address or is just the location) to the Garage model.
+    address: locationToGeocode,
   };
 
   // Prepare the full garage data object
@@ -113,11 +114,10 @@ export const completeOnboarding = catchAsync(async (req, res, next) => {
     name: garageName,
     description: about,
     user: req.user.id,
-    // 5. Assign the correctly prepared location object.
     location: garageLocationObject,
   };
 
-  // Create the garage and update the user in sequence (this part is correct)
+  // Create the garage and update the user in sequence
   const newGarage = await Garage.create(garageData);
   userUpdates.garage = newGarage._id;
 

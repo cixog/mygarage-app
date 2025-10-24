@@ -67,7 +67,13 @@ export default function GarageCard({ garage }) {
 
           {/* 3. Location (Note: Lower text size text-xs is preserved) */}
           <span className="text-xs text-gray-500 font-normal">
-            {garage.user?.location || 'Location not set'}
+            {/* 👇 THE FIX: Show the full address if it's different from the user's general location */}
+            {
+              garage.location?.address &&
+              garage.location.address !== garage.user?.location
+                ? garage.location.address // Use the specific garage address
+                : garage.user?.location || 'Location not set' // Fall back to the general user location
+            }
           </span>
         </div>
       </div>
